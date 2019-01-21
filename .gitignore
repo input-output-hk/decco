@@ -1,0 +1,11 @@
+.idea/
+.ijwb/
+target/
+*.log
+*.iml
+
+cef/network/db/
+local.sbt
+bazel-*
+.bazel-*
+.dazel_run
