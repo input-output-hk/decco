@@ -1,5 +1,5 @@
-# bicodec
-Binary codec library
+# decco
+A codec library
 
 ## Branches
 
