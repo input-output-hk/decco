@@ -112,7 +112,7 @@ private[components] object NativeCodecHelpers {
         var r: Option[Array[T]] = Some(arr)
         while (i < sizeElements && r.isDefined) {
           dec.decode(b) match {
-            case None    => r = None
+            case None => r = None
             case Some(e) => arr(i) = e
           }
           i += 1

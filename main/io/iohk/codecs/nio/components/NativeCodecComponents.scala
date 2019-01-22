@@ -20,7 +20,7 @@ private[components] object NativeCodecComponents {
     byteDecoder.mapOpt {
       case b if b == 0.toByte => Some(false)
       case b if b == 1.toByte => Some(true)
-      case _                  => None
+      case _ => None
     }
 
   val shortEncoder: NioEncoder[Short] =
@@ -107,10 +107,10 @@ private[components] object NativeCodecComponents {
   val booleanArrayDecoder: NioDecoder[Array[Boolean]] =
     byteArrayDecoder.mapOpt {
       _.foldLeft(Option(List.empty[Boolean])) {
-        case (None, _)                      => Option.empty[List[Boolean]]
+        case (None, _) => Option.empty[List[Boolean]]
         case (Some(bs), b) if b == 1.toByte => Some(true :: bs)
         case (Some(bs), b) if b == 0.toByte => Some(false :: bs)
-        case _                              => None
+        case _ => None
       }.map(_.reverse.toArray)
     }
 
