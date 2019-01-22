@@ -8,35 +8,41 @@ import io.iohk.codecs.nio.components.Ops._
 
 private[components] object CodecDecorators {
 
-  def messageLengthEncoder[T](enc: NioEncoder[T]): NioEncoder[T] = new NioEncoder[T] {
-    override val typeTag: TypeTag[T] = enc.typeTag
-    override def encode(t: T): ByteBuffer = {
+  def messageLengthEncoder[T](enc: NioEncoder[T]): NioEncoder[T] =
+    new NioEncoder[T] {
+      override val typeTag: TypeTag[T] = enc.typeTag
+      override def encode(t: T): ByteBuffer = {
 
-      val messageBuff: ByteBuffer = enc.encode(t)
-      val messageSize = messageBuff.remaining()
+        val messageBuff: ByteBuffer = enc.encode(t)
+        val messageSize = messageBuff.remaining()
 
-      ByteBuffer.allocate(messageSize + 4).putInt(messageSize).put(messageBuff).back()
+        ByteBuffer
+          .allocate(messageSize + 4)
+          .putInt(messageSize)
+          .put(messageBuff)
+          .back()
+      }
     }
-  }
 
-  def messageLengthDecoder[T](dec: NioDecoder[T]): NioDecoder[T] = new NioDecoder[T] {
-    override val typeTag: TypeTag[T] = dec.typeTag
-    override def decode(b: ByteBuffer): Option[T] = {
+  def messageLengthDecoder[T](dec: NioDecoder[T]): NioDecoder[T] =
+    new NioDecoder[T] {
+      override val typeTag: TypeTag[T] = dec.typeTag
+      override def decode(b: ByteBuffer): Option[T] = {
 
-      verifyingSuccess(b) {
+        verifyingSuccess(b) {
 
-        verifyingRemaining(4, b) {
+          verifyingRemaining(4, b) {
 
-          val messageSize = b.getInt()
+            val messageSize = b.getInt()
 
-          verifyingRemaining(messageSize, b) {
+            verifyingRemaining(messageSize, b) {
 
-            dec.decode(b)
+              dec.decode(b)
+            }
           }
         }
       }
     }
-  }
 
   def typeCodeEncoder[T](enc: NioEncoder[T]): NioEncoder[T] = {
     implicit val tt: TypeTag[T] = enc.typeTag
@@ -77,7 +83,9 @@ private[components] object CodecDecorators {
     }
   }
 
-  def verifyingRemaining[T](remaining: Int, b: ByteBuffer)(decode: => Option[T]): Option[T] = {
+  def verifyingRemaining[T](remaining: Int, b: ByteBuffer)(
+      decode: => Option[T]
+  ): Option[T] = {
     if (b.remaining() < remaining || remaining < 0)
       None
     else

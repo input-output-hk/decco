@@ -20,7 +20,9 @@ class CoproductCodecsSpec extends FlatSpec with CodecTestingHelpers {
 
   implicit val aArbitrary: Arbitrary[A] = Arbitrary(arbitrary[AT].map(A))
   implicit val bArbitrary: Arbitrary[B] = Arbitrary(arbitrary[BT].map(B))
-  implicit val baseArbitrary: Arbitrary[Base] = Arbitrary(Gen.oneOf(arbitrary[A], arbitrary[B]))
+  implicit val baseArbitrary: Arbitrary[Base] = Arbitrary(
+    Gen.oneOf(arbitrary[A], arbitrary[B])
+  )
 
   they should "support sealed heirarchies" in {
 

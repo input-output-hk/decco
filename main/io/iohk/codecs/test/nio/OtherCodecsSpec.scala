@@ -14,8 +14,12 @@ import io.iohk.codecs.nio.test.utils.CodecTestingHelpers
 
 class OtherCodecsSpec extends FlatSpec with CodecTestingHelpers {
 
-  implicit val arbByteString: Arbitrary[ByteString] = Arbitrary(arbitrary[Array[Byte]].map(arr => ByteString(arr)))
-  implicit val arbByteBuffer: Arbitrary[ByteBuffer] = Arbitrary(arbitrary[Array[Byte]].map(arr => ByteBuffer.wrap(arr)))
+  implicit val arbByteString: Arbitrary[ByteString] = Arbitrary(
+    arbitrary[Array[Byte]].map(arr => ByteString(arr))
+  )
+  implicit val arbByteBuffer: Arbitrary[ByteBuffer] = Arbitrary(
+    arbitrary[Array[Byte]].map(arr => ByteBuffer.wrap(arr))
+  )
 
   //Borrowed from here:
   //https://github.com/rallyhealth/scalacheck-ops/blob/master/core/src/main/scala/org/scalacheck/ops/time/ImplicitJavaTimeGenerators.scala
@@ -23,7 +27,10 @@ class OtherCodecsSpec extends FlatSpec with CodecTestingHelpers {
     import org.scalacheck.Gen._
     Arbitrary {
       for {
-        millis <- chooseNum(Instant.MIN.getEpochSecond, Instant.MAX.getEpochSecond)
+        millis <- chooseNum(
+          Instant.MIN.getEpochSecond,
+          Instant.MAX.getEpochSecond
+        )
         nanos <- chooseNum(Instant.MIN.getNano, Instant.MAX.getNano)
       } yield {
         Instant.ofEpochMilli(millis).plusNanos(nanos)

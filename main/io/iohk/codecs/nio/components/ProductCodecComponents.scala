@@ -55,10 +55,16 @@ object ProductCodecComponents {
       }
     })
 
-  def genericEncoder[T: TypeTag, R](implicit gen: Generic.Aux[T, R], enc: Lazy[NioEncoder[R]]): NioEncoder[T] =
+  def genericEncoder[T: TypeTag, R](
+      implicit gen: Generic.Aux[T, R],
+      enc: Lazy[NioEncoder[R]]
+  ): NioEncoder[T] =
     enc.value.map[T](gen to _).packed
 
-  def genericDecoder[T: TypeTag, R](implicit gen: Generic.Aux[T, R], dec: Lazy[NioDecoder[R]]): NioDecoder[T] = {
+  def genericDecoder[T: TypeTag, R](
+      implicit gen: Generic.Aux[T, R],
+      dec: Lazy[NioDecoder[R]]
+  ): NioDecoder[T] = {
     dec.value.map[T](gen from _).packed
   }
 }

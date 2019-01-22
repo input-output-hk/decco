@@ -14,7 +14,7 @@ import io.iohk.codecs.nio.test.utils.CodecTestingHelpers
 
 import scala.util.Random
 
-class StreamCodecsSpec extends FlatSpec with CodecTestingHelpers{
+class StreamCodecsSpec extends FlatSpec with CodecTestingHelpers {
 
   object UserCode {
     case class A(i: Int, s: String)
@@ -143,7 +143,11 @@ class StreamCodecsSpec extends FlatSpec with CodecTestingHelpers{
   it should "not choke on empty buffers" in {
     forAll(genTestData) { testData =>
       import testData._
-      decodeStream(address, ByteBuffer.allocate(0), List(aDecoderFn, bDecoderFn, cDecoderFn))
+      decodeStream(
+        address,
+        ByteBuffer.allocate(0),
+        List(aDecoderFn, bDecoderFn, cDecoderFn)
+      )
 
       verifyZeroInteractions(aHandler)
       verifyZeroInteractions(bHandler)

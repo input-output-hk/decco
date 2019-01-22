@@ -9,7 +9,9 @@ import io.iohk.codecs.nio.test.utils.CodecTestingHelpers
 
 class NativeCodecsSpec extends FlatSpec with CodecTestingHelpers {
 
-  implicit val arbByteString: Arbitrary[ByteString] = Arbitrary(arbitrary[Array[Byte]].map(arr => ByteString(arr)))
+  implicit val arbByteString: Arbitrary[ByteString] = Arbitrary(
+    arbitrary[Array[Byte]].map(arr => ByteString(arr))
+  )
 
   behavior of "Codecs"
 

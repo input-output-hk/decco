@@ -17,6 +17,9 @@ trait ProductCodecs {
   ): NioCodec[H :: T] =
     NioCodec(hListEncoder, hListDecoder)
 
-  implicit def genericCodec[T: TypeTag, R](implicit gen: Generic.Aux[T, R], enc: Lazy[NioCodec[R]]): NioCodec[T] =
+  implicit def genericCodec[T: TypeTag, R](
+      implicit gen: Generic.Aux[T, R],
+      enc: Lazy[NioCodec[R]]
+  ): NioCodec[T] =
     NioCodec(genericEncoder, genericDecoder)
 }

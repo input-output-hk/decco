@@ -6,12 +6,17 @@ import scala.reflect.runtime.universe.TypeTag
 
 trait NioCodecs extends StreamCodecs {
 
-  trait NioCodec[T] extends NioEncoder[T] with NioDecoder[T] with Codec[T, ByteBuffer] { self =>
-    def mapOpt[U: TypeTag](ef: U => T, df: T => Option[U]): NioCodec[U] = new NioCodec[U] {
-      override def typeTag: TypeTag[U] = implicitly[TypeTag[U]]
-      override def encode(u: U): ByteBuffer = self.encode(ef(u))
-      override def decode(b: ByteBuffer): Option[U] = self.decode(b).flatMap(df)
-    }
+  trait NioCodec[T]
+      extends NioEncoder[T]
+      with NioDecoder[T]
+      with Codec[T, ByteBuffer] { self =>
+    def mapOpt[U: TypeTag](ef: U => T, df: T => Option[U]): NioCodec[U] =
+      new NioCodec[U] {
+        override def typeTag: TypeTag[U] = implicitly[TypeTag[U]]
+        override def encode(u: U): ByteBuffer = self.encode(ef(u))
+        override def decode(b: ByteBuffer): Option[U] =
+          self.decode(b).flatMap(df)
+      }
     def map[U: TypeTag](ef: U => T, df: T => U): NioCodec[U] =
       mapOpt(ef, (t: T) => Some(df(t)))
   }
@@ -35,9 +40,12 @@ trait NioCodecs extends StreamCodecs {
 
   object NioEncoder {
     def apply[T](implicit enc: NioEncoder[T]): NioEncoder[T] = enc
-    def apply[T: TypeTag](f: T => ByteBuffer): NioEncoder[T] = funcToNioEncoder(f)
+    def apply[T: TypeTag](f: T => ByteBuffer): NioEncoder[T] =
+      funcToNioEncoder(f)
 
-    private def funcToNioEncoder[T: TypeTag](f: T => ByteBuffer): NioEncoder[T] =
+    private def funcToNioEncoder[T: TypeTag](
+        f: T => ByteBuffer
+    ): NioEncoder[T] =
       new NioEncoder[T] {
         override val typeTag: TypeTag[T] = implicitly[TypeTag[T]]
         override def encode(t: T): ByteBuffer = f(t)
@@ -56,9 +64,12 @@ trait NioCodecs extends StreamCodecs {
 
   object NioDecoder {
     def apply[T](implicit dec: NioDecoder[T]): NioDecoder[T] = dec
-    def apply[T: TypeTag](f: ByteBuffer => Option[T]): NioDecoder[T] = funcToNioDecoder(f)
+    def apply[T: TypeTag](f: ByteBuffer => Option[T]): NioDecoder[T] =
+      funcToNioDecoder(f)
 
-    private def funcToNioDecoder[T: TypeTag](f: ByteBuffer => Option[T]): NioDecoder[T] =
+    private def funcToNioDecoder[T: TypeTag](
+        f: ByteBuffer => Option[T]
+    ): NioDecoder[T] =
       new NioDecoder[T] {
         override val typeTag: TypeTag[T] = implicitly[TypeTag[T]]
         override def decode(b: ByteBuffer): Option[T] = f(b)

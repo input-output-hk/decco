@@ -56,21 +56,29 @@ private[components] object CoproductCodecComponents {
   sealed trait SafeNone[T]
 
   private def noneEncoder[T: TypeTag]: NioEncoder[SafeNone[T]] = {
-    val inner: NioEncoder[SafeNone[T]] = NioEncoder((_: SafeNone[T]) => ByteBuffer.allocate(0))
+    val inner: NioEncoder[SafeNone[T]] = NioEncoder(
+      (_: SafeNone[T]) => ByteBuffer.allocate(0)
+    )
     inner.packed
   }
 
   private def noneDecoder[T: TypeTag]: NioDecoder[SafeNone[T]] = {
-    val inner: NioDecoder[SafeNone[T]] = NioDecoder((_: ByteBuffer) => Some(new SafeNone[T] {}))
+    val inner: NioDecoder[SafeNone[T]] = NioDecoder(
+      (_: ByteBuffer) => Some(new SafeNone[T] {})
+    )
     inner.packed
   }
 
-  private def someEncoder[T](implicit enc: NioEncoder[T]): NioEncoder[Some[T]] = {
+  private def someEncoder[T](
+      implicit enc: NioEncoder[T]
+  ): NioEncoder[Some[T]] = {
     implicit val ttT: TypeTag[T] = NioEncoder[T].typeTag
     enc.map[Some[T]](_.get).packed
   }
 
-  private def someDecoder[T](implicit dec: NioDecoder[T]): NioDecoder[Some[T]] = {
+  private def someDecoder[T](
+      implicit dec: NioDecoder[T]
+  ): NioDecoder[Some[T]] = {
     implicit val tt: TypeTag[T] = dec.typeTag
     dec.map(Some.apply).packed
   }
@@ -79,7 +87,7 @@ private[components] object CoproductCodecComponents {
     implicit val ttT: TypeTag[T] = NioEncoder[T].typeTag
     val f: Option[T] => ByteBuffer = {
       case s: Some[T] => someEncoder[T].encode(s)
-      case None => noneEncoder[T].encode(new SafeNone[T] {})
+      case None       => noneEncoder[T].encode(new SafeNone[T] {})
     }
     NioEncoder(f)
   }
@@ -97,16 +105,24 @@ private[components] object CoproductCodecComponents {
     NioDecoder(f)
   }
 
-  private def leftDecoder[L: TypeTag, R: TypeTag](implicit dec: NioDecoder[L]): NioDecoder[Left[L, R]] =
+  private def leftDecoder[L: TypeTag, R: TypeTag](
+      implicit dec: NioDecoder[L]
+  ): NioDecoder[Left[L, R]] =
     dec.map[Left[L, R]](Left.apply).packed
 
-  private def rightDecoder[L: TypeTag, R: TypeTag](implicit dec: NioDecoder[R]): NioDecoder[Right[L, R]] =
+  private def rightDecoder[L: TypeTag, R: TypeTag](
+      implicit dec: NioDecoder[R]
+  ): NioDecoder[Right[L, R]] =
     dec.map[Right[L, R]](Right.apply).packed
 
-  private def leftEncoder[L: TypeTag, R: TypeTag](implicit lEnc: NioEncoder[L]): NioEncoder[Left[L, R]] =
+  private def leftEncoder[L: TypeTag, R: TypeTag](
+      implicit lEnc: NioEncoder[L]
+  ): NioEncoder[Left[L, R]] =
     lEnc.map[Left[L, R]](_.value).packed
 
-  private def rightEncoder[L: TypeTag, R: TypeTag](implicit rEnc: NioEncoder[R]): NioEncoder[Right[L, R]] =
+  private def rightEncoder[L: TypeTag, R: TypeTag](
+      implicit rEnc: NioEncoder[R]
+  ): NioEncoder[Right[L, R]] =
     rEnc.map[Right[L, R]](_.value).packed
 
   def eitherEncoder[L: NioEncoder, R: NioEncoder]: NioEncoder[Either[L, R]] = {
@@ -114,7 +130,7 @@ private[components] object CoproductCodecComponents {
     implicit val ttR: TypeTag[R] = NioEncoder[R].typeTag
 
     NioEncoder({
-      case l: Left[L, R] => leftEncoder[L, R].encode(l)
+      case l: Left[L, R]  => leftEncoder[L, R].encode(l)
       case r: Right[L, R] => rightEncoder[L, R].encode(r)
     }: PartialFunction[Either[L, R], ByteBuffer])
   }

@@ -11,10 +11,18 @@ import scala.reflect.runtime.universe.TypeTag
 
 private[components] object NativeCodecHelpers {
 
-  def nativeDecoder[T: TypeTag](size: Int, extract: ByteBuffer => T): NioDecoder[T] =
-    NioDecoder((b: ByteBuffer) => verifyingRemaining(size, b) { Some(extract(b)) })
+  def nativeDecoder[T: TypeTag](
+      size: Int,
+      extract: ByteBuffer => T
+  ): NioDecoder[T] =
+    NioDecoder(
+      (b: ByteBuffer) => verifyingRemaining(size, b) { Some(extract(b)) }
+    )
 
-  def nativeEncoder[T: TypeTag](size: Int, put: ByteBuffer => T => ByteBuffer): NioEncoder[T] =
+  def nativeEncoder[T: TypeTag](
+      size: Int,
+      put: ByteBuffer => T => ByteBuffer
+  ): NioEncoder[T] =
     NioEncoder((t: T) => new ByteBufferExtension(put(allocate(size))(t)).back())
 
   def nativeArrayEncoder[T: TypeTag, TB](tSize: Int, as: ByteBuffer => TB)(
@@ -22,7 +30,10 @@ private[components] object NativeCodecHelpers {
   ): NioEncoder[Array[T]] =
     untaggedNativeArrayEncoder(tSize, as)(put).packed
 
-  def untaggedNativeArrayEncoder[T: TypeTag, TB](tSize: Int, as: ByteBuffer => TB)(
+  def untaggedNativeArrayEncoder[T: TypeTag, TB](
+      tSize: Int,
+      as: ByteBuffer => TB
+  )(
       put: TB => Array[T] => TB
   ): NioEncoder[Array[T]] = {
     val inner =
@@ -41,7 +52,10 @@ private[components] object NativeCodecHelpers {
   ): NioDecoder[Array[T]] =
     untaggedNativeArrayDecoder(tSize, as)(get).packed
 
-  def untaggedNativeArrayDecoder[T: TypeTag, TB](tSize: Int, as: ByteBuffer => TB)(
+  def untaggedNativeArrayDecoder[T: TypeTag, TB](
+      tSize: Int,
+      as: ByteBuffer => TB
+  )(
       get: TB => Array[T] => TB
   ): NioDecoder[Array[T]] = {
     val inner = { b: ByteBuffer =>
@@ -60,7 +74,9 @@ private[components] object NativeCodecHelpers {
     NioDecoder(inner)
   }
 
-  def variableSizeArrayEncoderImpl[T](implicit enc: NioEncoder[T]): NioEncoder[Array[T]] = {
+  def variableSizeArrayEncoderImpl[T](
+      implicit enc: NioEncoder[T]
+  ): NioEncoder[Array[T]] = {
     implicit val ttT: TypeTag[T] = enc.typeTag
     NioEncoder((a: Array[T]) => {
 
@@ -83,7 +99,9 @@ private[components] object NativeCodecHelpers {
     })
   }
 
-  def variableSizeArrayDecoderImpl[T](implicit dec: NioDecoder[T]): NioDecoder[Array[T]] = {
+  def variableSizeArrayDecoderImpl[T](
+      implicit dec: NioDecoder[T]
+  ): NioDecoder[Array[T]] = {
     implicit val ttT: TypeTag[T] = dec.typeTag
     NioDecoder((b: ByteBuffer) => {
       verifyingRemaining(4, b) {
@@ -94,7 +112,7 @@ private[components] object NativeCodecHelpers {
         var r: Option[Array[T]] = Some(arr)
         while (i < sizeElements && r.isDefined) {
           dec.decode(b) match {
-            case None => r = None
+            case None    => r = None
             case Some(e) => arr(i) = e
           }
           i += 1

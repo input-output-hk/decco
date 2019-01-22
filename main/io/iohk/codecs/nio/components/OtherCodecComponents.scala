@@ -47,32 +47,50 @@ private[components] object OtherCodecComponents {
     dec.map[Map[K, V]](_.toMap).packed
   }
 
-  def seqEncoder[T](implicit enc: NioEncoder[Array[T]], encT: NioEncoder[T]): NioEncoder[Seq[T]] = {
+  def seqEncoder[T](
+      implicit enc: NioEncoder[Array[T]],
+      encT: NioEncoder[T]
+  ): NioEncoder[Seq[T]] = {
     implicit val tt: TypeTag[T] = encT.typeTag
     enc.map[Seq[T]](_.toArray).packed
   }
 
-  def seqDecoder[T](implicit dec: NioDecoder[Array[T]], decT: NioDecoder[T]): NioDecoder[Seq[T]] = {
+  def seqDecoder[T](
+      implicit dec: NioDecoder[Array[T]],
+      decT: NioDecoder[T]
+  ): NioDecoder[Seq[T]] = {
     implicit val tt: TypeTag[T] = decT.typeTag
     dec.map[Seq[T]](_.toSeq).packed
   }
 
-  def listEncoder[T](implicit enc: NioEncoder[Array[T]], encT: NioEncoder[T]): NioEncoder[List[T]] = {
+  def listEncoder[T](
+      implicit enc: NioEncoder[Array[T]],
+      encT: NioEncoder[T]
+  ): NioEncoder[List[T]] = {
     implicit val tt: TypeTag[T] = encT.typeTag
     enc.map[List[T]](_.toArray).packed
   }
 
-  def listDecoder[T](implicit dec: NioDecoder[Array[T]], decT: NioDecoder[T]): NioDecoder[List[T]] = {
+  def listDecoder[T](
+      implicit dec: NioDecoder[Array[T]],
+      decT: NioDecoder[T]
+  ): NioDecoder[List[T]] = {
     implicit val tt: TypeTag[T] = decT.typeTag
     dec.map[List[T]](_.toList).packed
   }
 
-  def setEncoder[T](implicit enc: NioEncoder[Array[T]], encT: NioEncoder[T]): NioEncoder[Set[T]] = {
+  def setEncoder[T](
+      implicit enc: NioEncoder[Array[T]],
+      encT: NioEncoder[T]
+  ): NioEncoder[Set[T]] = {
     implicit val tt: TypeTag[T] = encT.typeTag
     enc.map[Set[T]](_.toArray).packed
   }
 
-  def setDecoder[T](implicit dec: NioDecoder[Array[T]], decT: NioDecoder[T]): NioDecoder[Set[T]] = {
+  def setDecoder[T](
+      implicit dec: NioDecoder[Array[T]],
+      decT: NioDecoder[T]
+  ): NioDecoder[Set[T]] = {
     implicit val tt: TypeTag[T] = decT.typeTag
     dec.map[Set[T]](_.toSet).packed
   }
@@ -95,28 +113,44 @@ private[components] object OtherCodecComponents {
   val uuidDecoder: NioDecoder[UUID] =
     stringDecoder.map[UUID](UUID.fromString).packed
 
-  def instantEncoder(implicit enc: NioEncoder[(Long, Int)]): NioEncoder[Instant] =
+  def instantEncoder(
+      implicit enc: NioEncoder[(Long, Int)]
+  ): NioEncoder[Instant] =
     enc.map[Instant](i => (i.getEpochSecond, i.getNano)).packed
 
-  def instantDecoder(implicit dec: NioDecoder[(Long, Int)]): NioDecoder[Instant] =
+  def instantDecoder(
+      implicit dec: NioDecoder[(Long, Int)]
+  ): NioDecoder[Instant] =
     dec.map { case (l, i) => Instant.ofEpochSecond(l, i.toLong) }.packed
 
-  def localDateEncoder(implicit enc: NioEncoder[Instant]): NioEncoder[LocalDate] =
+  def localDateEncoder(
+      implicit enc: NioEncoder[Instant]
+  ): NioEncoder[LocalDate] =
     enc.map[LocalDate](_.atStartOfDay().toInstant(ZoneOffset.UTC)).packed
 
-  def localDateDecoder(implicit dec: NioDecoder[Instant]): NioDecoder[LocalDate] =
-    dec.map[LocalDate](LocalDateTime.ofInstant(_, ZoneOffset.UTC).toLocalDate).packed
+  def localDateDecoder(
+      implicit dec: NioDecoder[Instant]
+  ): NioDecoder[LocalDate] =
+    dec
+      .map[LocalDate](LocalDateTime.ofInstant(_, ZoneOffset.UTC).toLocalDate)
+      .packed
 
   val inetAddressEncoder: NioEncoder[InetAddress] =
     byteArrayEncoder.map[InetAddress](ia => ia.getAddress).packed
 
   val inetAddressDecoder: NioDecoder[InetAddress] =
-    byteArrayDecoder.mapOpt((bs: Array[Byte]) => Try(InetAddress.getByAddress(bs)).toOption).packed
+    byteArrayDecoder
+      .mapOpt((bs: Array[Byte]) => Try(InetAddress.getByAddress(bs)).toOption)
+      .packed
 
-  def inetSocketAddressEncoder(implicit e: NioEncoder[(InetAddress, Int)]): NioEncoder[InetSocketAddress] =
+  def inetSocketAddressEncoder(
+      implicit e: NioEncoder[(InetAddress, Int)]
+  ): NioEncoder[InetSocketAddress] =
     e.map[InetSocketAddress](addr => (addr.getAddress, addr.getPort))
 
-  def inetSocketAddressDecoder(implicit d: NioDecoder[(InetAddress, Int)]): NioDecoder[InetSocketAddress] =
+  def inetSocketAddressDecoder(
+      implicit d: NioDecoder[(InetAddress, Int)]
+  ): NioDecoder[InetSocketAddress] =
     d.mapOpt { case (ia, p) => Try(new InetSocketAddress(ia, p)).toOption }
 
 }

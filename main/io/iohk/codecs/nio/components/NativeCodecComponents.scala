@@ -20,7 +20,7 @@ private[components] object NativeCodecComponents {
     byteDecoder.mapOpt {
       case b if b == 0.toByte => Some(false)
       case b if b == 1.toByte => Some(true)
-      case _ => None
+      case _                  => None
     }
 
   val shortEncoder: NioEncoder[Short] =
@@ -107,10 +107,10 @@ private[components] object NativeCodecComponents {
   val booleanArrayDecoder: NioDecoder[Array[Boolean]] =
     byteArrayDecoder.mapOpt {
       _.foldLeft(Option(List.empty[Boolean])) {
-        case (None, _) => Option.empty[List[Boolean]]
+        case (None, _)                      => Option.empty[List[Boolean]]
         case (Some(bs), b) if b == 1.toByte => Some(true :: bs)
         case (Some(bs), b) if b == 0.toByte => Some(false :: bs)
-        case _ => None
+        case _                              => None
       }.map(_.reverse.toArray)
     }
 
@@ -126,9 +126,13 @@ private[components] object NativeCodecComponents {
   val stringDecoder: NioDecoder[String] =
     byteArrayDecoder.map(as => new String(as, "UTF-8")).packed
 
-  def variableSizeArrayEncoder[T](implicit enc: NioEncoder[T]): NioEncoder[Array[T]] =
+  def variableSizeArrayEncoder[T](
+      implicit enc: NioEncoder[T]
+  ): NioEncoder[Array[T]] =
     variableSizeArrayEncoderImpl[T].packed
 
-  def variableSizeArrayDecoder[T](implicit dec: NioDecoder[T]): NioDecoder[Array[T]] =
+  def variableSizeArrayDecoder[T](
+      implicit dec: NioDecoder[T]
+  ): NioDecoder[Array[T]] =
     variableSizeArrayDecoderImpl[T].packed
 }

@@ -10,12 +10,14 @@ trait StreamCodecs {
   /**
     * Turn a standard decoder into StreamDecoder with decodeStream.
     */
-  implicit def streamDecoderAdapter[T](codec: NioCodec[T]): NioStreamDecoder[T] = new NioStreamDecoder[T] {
+  implicit def streamDecoderAdapter[T](
+      codec: NioCodec[T]
+  ): NioStreamDecoder[T] = new NioStreamDecoder[T] {
     override def decodeStream(b: ByteBuffer): Seq[T] = {
       @annotation.tailrec
       def loop(acc: Seq[T]): Seq[T] = {
         codec.decode(b) match {
-          case None => acc
+          case None        => acc
           case Some(frame) => loop(acc :+ frame)
         }
       }
@@ -24,13 +26,17 @@ trait StreamCodecs {
   }
 
   type ApplicableMessage = () => Unit
-  type MessageApplication[Address] = (Address, ByteBuffer) => Seq[ApplicableMessage]
+  type MessageApplication[Address] =
+    (Address, ByteBuffer) => Seq[ApplicableMessage]
 
   def lazyMessageApplication[Address, Message, R](
       codec: NioCodec[Message],
       handler: (Address, Message) => Unit
   ): MessageApplication[Address] =
-    (address, byteBuffer) => codec.decodeStream(byteBuffer).map(message => () => handler(address, message))
+    (address, byteBuffer) =>
+      codec
+        .decodeStream(byteBuffer)
+        .map(message => () => handler(address, message))
 
   def strictMessageApplication[Address, Message, R](
       codec: NioCodec[Message],
@@ -70,9 +76,13 @@ trait StreamCodecs {
     def bufferLoop(acc: Vector[ApplicableMessage]): Seq[ApplicableMessage] = {
 
       @tailrec
-      def decoderLoop(iDecoder: Int, innerAcc: Vector[ApplicableMessage]): Seq[ApplicableMessage] = {
+      def decoderLoop(
+          iDecoder: Int,
+          innerAcc: Vector[ApplicableMessage]
+      ): Seq[ApplicableMessage] = {
         if (iDecoder < messageAppliers.size) {
-          val applicationResult: Seq[ApplicableMessage] = messageAppliers(iDecoder).apply(address, b)
+          val applicationResult: Seq[ApplicableMessage] =
+            messageAppliers(iDecoder).apply(address, b)
           if (applicationResult.nonEmpty)
             innerAcc ++ applicationResult
           else

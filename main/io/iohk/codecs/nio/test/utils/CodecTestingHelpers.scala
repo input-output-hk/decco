@@ -2,7 +2,6 @@ package io.iohk.codecs.nio
 package test.utils
 import java.nio.ByteBuffer
 
-
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.Equivalence
@@ -34,7 +33,11 @@ trait CodecTestingHelpers {
     }
   }
 
-  def mistypeTest[T, U](implicit encoder: NioEncoder[T], decoder: NioDecoder[U], a: Arbitrary[T]): Unit = {
+  def mistypeTest[T, U](
+      implicit encoder: NioEncoder[T],
+      decoder: NioDecoder[U],
+      a: Arbitrary[T]
+  ): Unit = {
 
     forAll(arbitrary[T]) { t =>
       val buff: ByteBuffer = encoder.encode(t)
@@ -45,7 +48,11 @@ trait CodecTestingHelpers {
     }
   }
 
-  def bufferPositionTest[T](implicit encoder: NioEncoder[T], decoder: NioDecoder[T], a: Arbitrary[T]): Unit = {
+  def bufferPositionTest[T](
+      implicit encoder: NioEncoder[T],
+      decoder: NioDecoder[T],
+      a: Arbitrary[T]
+  ): Unit = {
     forAll(arbitrary[T]) { t =>
       val b: ByteBuffer = encoder.encode(t)
       val remaining = b.remaining()
@@ -55,13 +62,20 @@ trait CodecTestingHelpers {
     }
   }
 
-  def variableLengthTest[T](implicit encoder: NioEncoder[T], decoder: NioDecoder[T], a: Arbitrary[T]): Unit = {
+  def variableLengthTest[T](
+      implicit encoder: NioEncoder[T],
+      decoder: NioDecoder[T],
+      a: Arbitrary[T]
+  ): Unit = {
     forAll(arbitrary[T]) { t =>
       // create a buffer with one half full of real data
       // and the second half full of rubbish.
       // decoders should not be fooled by this.
       val b: ByteBuffer = encoder.encode(t)
-      val newB = ByteBuffer.allocate(b.capacity() * 2).put(b).put(randomBytes(b.capacity()))
+      val newB = ByteBuffer
+        .allocate(b.capacity() * 2)
+        .put(b)
+        .put(randomBytes(b.capacity()))
       (newB: java.nio.Buffer).flip()
 
       inside(decoder.decode(newB)) {
@@ -108,10 +122,13 @@ trait CodecTestingHelpers {
   }
 
   def concatenate(buffs: Seq[ByteBuffer]): ByteBuffer = {
-    val allocSize = buffs.foldLeft(0)((acc, nextBuff) => acc + nextBuff.capacity())
+    val allocSize =
+      buffs.foldLeft(0)((acc, nextBuff) => acc + nextBuff.capacity())
 
     val b0 = ByteBuffer.allocate(allocSize)
 
-    (buffs.foldLeft(b0)((accBuff, nextBuff) => accBuff.put(nextBuff)): java.nio.Buffer).flip().asInstanceOf[ByteBuffer]
+    (buffs.foldLeft(b0)((accBuff, nextBuff) => accBuff.put(nextBuff)): java.nio.Buffer)
+      .flip()
+      .asInstanceOf[ByteBuffer]
   }
 }
