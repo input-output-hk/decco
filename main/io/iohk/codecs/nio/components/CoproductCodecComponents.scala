@@ -87,7 +87,7 @@ private[components] object CoproductCodecComponents {
     implicit val ttT: TypeTag[T] = NioEncoder[T].typeTag
     val f: Option[T] => ByteBuffer = {
       case s: Some[T] => someEncoder[T].encode(s)
-      case None       => noneEncoder[T].encode(new SafeNone[T] {})
+      case None => noneEncoder[T].encode(new SafeNone[T] {})
     }
     NioEncoder(f)
   }
@@ -130,7 +130,7 @@ private[components] object CoproductCodecComponents {
     implicit val ttR: TypeTag[R] = NioEncoder[R].typeTag
 
     NioEncoder({
-      case l: Left[L, R]  => leftEncoder[L, R].encode(l)
+      case l: Left[L, R] => leftEncoder[L, R].encode(l)
       case r: Right[L, R] => rightEncoder[L, R].encode(r)
     }: PartialFunction[Either[L, R], ByteBuffer])
   }

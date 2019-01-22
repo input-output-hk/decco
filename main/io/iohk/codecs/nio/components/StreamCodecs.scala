@@ -17,7 +17,7 @@ trait StreamCodecs {
       @annotation.tailrec
       def loop(acc: Seq[T]): Seq[T] = {
         codec.decode(b) match {
-          case None        => acc
+          case None => acc
           case Some(frame) => loop(acc :+ frame)
         }
       }

@@ -6,10 +6,7 @@ import scala.reflect.runtime.universe.TypeTag
 
 trait NioCodecs extends StreamCodecs {
 
-  trait NioCodec[T]
-      extends NioEncoder[T]
-      with NioDecoder[T]
-      with Codec[T, ByteBuffer] { self =>
+  trait NioCodec[T] extends NioEncoder[T] with NioDecoder[T] with Codec[T, ByteBuffer] { self =>
     def mapOpt[U: TypeTag](ef: U => T, df: T => Option[U]): NioCodec[U] =
       new NioCodec[U] {
         override def typeTag: TypeTag[U] = implicitly[TypeTag[U]]
