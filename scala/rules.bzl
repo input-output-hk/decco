@@ -53,9 +53,3 @@ def scala_test(name, srcs = None, deps = [], resources = None, scalac_jvm_flags 
         scalac_jvm_flags = scalac_jvm_flags,
         **kwargs
     )
-
-#  scala_repl(
-#    name = "%s_repl" % name,
-#    deps = deps + [name],
-#    scalac_jvm_flags = scalac_jvm_flags,
-#  )
