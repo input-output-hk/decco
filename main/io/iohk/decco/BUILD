@@ -1,0 +1,14 @@
+load("//scala:rules.bzl", "scala_library", "scala_test")
+
+scala_library(
+    name = "decco",
+    deps = [  "//3rdparty/jvm/com/chuusai:shapeless" ],
+    exports = ["//3rdparty/jvm/com/chuusai:shapeless"],
+)
+
+scala_test(
+    name = "tests",
+    deps = [ "decco",
+             "//main/io/iohk/codecs/nio/test/utils",
+             "//3rdparty/jvm/org/scalacheck:scalacheck" ]
+)
