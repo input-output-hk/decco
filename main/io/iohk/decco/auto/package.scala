@@ -61,6 +61,41 @@ package object auto {
       }
   }
 
+  implicit val IntArrayPartialCodec: PartialCodec[Array[Int]] =
+    buildNativeArrayCodec[Int]
+
+  implicit val ByteArrayPartialCodec: PartialCodec[Array[Byte]] =
+    buildNativeArrayCodec[Byte]
+
+  implicit val StringPartialCodec: PartialCodec[String] =
+    ByteArrayPartialCodec.map[String](bs => new String(bs, "UTF-8"), s => s.getBytes("UTF-8"))
+
+  // UTILS
+
+  private def buildNativeArrayCodec[T: ClassTag](implicit iCodec: PartialCodec[Int], tCodec: PartialCodec[T]): PartialCodec[Array[T]] =
+    new PartialCodec[Array[T]] {
+
+      def size(ts: Array[T]): Int = iCodec.size(ts.length) + pureArraySize(ts)
+
+      def decode(start: Int, source: Array[Byte]): DecodeResult[Array[T]] = {
+        iCodec.decode(start, source) match {
+          case DecodeResult.Success(count, nextIndex) =>
+            pureArrayDecode(nextIndex, source, count)
+          case DecodeResult.Failure =>
+            DecodeResult.Failure
+        }
+      }
+
+      def encode(ts: Array[T], start: Int, destination: Array[Byte]): EncodeResult =
+        iCodec.encode(ts.length, start, destination) match {
+          case EncodeResult.EncodeSuccess =>
+            pureArrayEncode(ts, start + iCodec.size(ts.length), destination)
+          case otherwise =>
+            otherwise
+        }
+
+  }
+
   private def pureArraySize[T](ts: Array[T])(implicit tCodec: PartialCodec[T]): Int =
     ts.headOption match {
       case None => 0
