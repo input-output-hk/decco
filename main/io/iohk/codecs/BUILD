@@ -3,8 +3,8 @@ load("//scala:rules.bzl", "scala_library", "scala_test")
 scala_library(
     name = "codecs",
     deps = [ "//3rdparty/jvm/com/typesafe/akka:akka_actor",
-             "//3rdparty/jvm/com/chuusai:shapeless" ],
-    exports = ["//3rdparty/jvm/com/chuusai:shapeless"],
+             "//3rdparty/jvm/com/chuusai:shapeless_EXT" ],
+    exports = ["//3rdparty/jvm/com/chuusai:shapeless_EXT"],
 )
 
 scala_test(
