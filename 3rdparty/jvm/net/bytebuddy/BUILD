@@ -5,9 +5,9 @@ java_library(
     exports = [
         "//external:jar/net/bytebuddy/byte_buddy"
     ],
-    neverlink = True,
+    neverlink = 1,
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 
@@ -16,9 +16,8 @@ java_library(
     exports = [
         "//external:jar/net/bytebuddy/byte_buddy"
     ],
-    neverlink = False,
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 
@@ -29,9 +28,9 @@ java_library(
     exports = [
         "//external:jar/net/bytebuddy/byte_buddy_agent"
     ],
-    neverlink = True,
+    neverlink = 1,
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 
@@ -40,9 +39,8 @@ java_library(
     exports = [
         "//external:jar/net/bytebuddy/byte_buddy_agent"
     ],
-    neverlink = False,
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 

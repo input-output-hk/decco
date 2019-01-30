@@ -7,8 +7,8 @@ options:
     - id: "mavencentral"
       type: "default"
       url: https://repo.maven.apache.org/maven2/
-  strictVisibility: true
-  transitivity: runtime_deps
+  strictVisibility: false # Makes transitive dependencies referenciable from BUILD files
+  transitivity: runtime_deps # Forces all dependencies (direct and transitive) to be declared in BUILD files
   versionConflictPolicy: highest
 
 dependencies:

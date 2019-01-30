@@ -5,9 +5,9 @@ java_library(
     exports = [
         "//external:jar/org/objenesis/objenesis"
     ],
-    neverlink = True,
+    neverlink = 1,
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 
@@ -16,9 +16,8 @@ java_library(
     exports = [
         "//external:jar/org/objenesis/objenesis"
     ],
-    neverlink = False,
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 

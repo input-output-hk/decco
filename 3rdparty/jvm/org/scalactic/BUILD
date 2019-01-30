@@ -2,31 +2,30 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_library")
 load("@io_bazel_rules_scala//scala:scala_import.bzl", "scala_import")
 scala_import(
     name = "scalactic_EXT",
-    exports = [
-        "//3rdparty/jvm/org/scala_lang:scala_library",
-        "//3rdparty/jvm/org/scala_lang:scala_reflect"
-    ],
     jars = [
         "//external:jar/org/scalactic/scalactic_2_12"
     ],
-    neverlink = True,
+    neverlink = 1,
+    runtime_deps = [
+        "//3rdparty/jvm/org/scala_lang:scala_library",
+        "//3rdparty/jvm/org/scala_lang:scala_reflect"
+    ],
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 
 scala_import(
     name = "scalactic",
-    exports = [
-        "//3rdparty/jvm/org/scala_lang:scala_library",
-        "//3rdparty/jvm/org/scala_lang:scala_reflect"
-    ],
     jars = [
         "//external:jar/org/scalactic/scalactic_2_12"
     ],
-    neverlink = False,
+    runtime_deps = [
+        "//3rdparty/jvm/org/scala_lang:scala_library",
+        "//3rdparty/jvm/org/scala_lang:scala_reflect"
+    ],
     visibility = [
-        "//3rdparty/jvm:__subpackages__"
+        "//visibility:public"
     ]
 )
 

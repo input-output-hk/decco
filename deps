@@ -16,8 +16,10 @@ if [ -e $BAZEL_DEPS ]; then
 else
     git clone https://github.com/marcesquerra/bazel-deps.git "$BAZEL_DEPS"
     cd "$BAZEL_DEPS"
-    git checkout d517a874dbdd655e5e770edf0b221723d851a217
 fi
 
+COMMIT=36f8d0fd52b42229f1ab2e06c03a2d4a6e105e7c
+
+(git checkout $COMMIT || (git fetch && git checkout $COMMIT)) &&
 bazel run //:parse -- generate -r $ROOT -s 3rdparty/workspace.bzl -d dependencies.yaml
 
