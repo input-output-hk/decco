@@ -1,8 +1,8 @@
 load("@io_bazel_rules_scala//scala:scala.bzl", "scala_library")
 load("@io_bazel_rules_scala//scala:scala_import.bzl", "scala_import")
-java_library(
+scala_import(
     name = "test_interface_EXT",
-    exports = [
+    jars = [
         "//external:jar/org/scala_sbt/test_interface"
     ],
     neverlink = 1,
@@ -11,9 +11,9 @@ java_library(
     ]
 )
 
-java_library(
+scala_import(
     name = "test_interface",
-    exports = [
+    jars = [
         "//external:jar/org/scala_sbt/test_interface"
     ],
     visibility = [

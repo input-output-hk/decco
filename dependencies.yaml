@@ -33,7 +33,43 @@ dependencies:
   org.mockito:
     mockito-core:
       version: "2.21.0"
-      lang: java
+      lang: scala/unmangled
+
+
+
+
+  com.typesafe:
+    config:
+      version: "1.3.2"
+      lang: scala/unmangled
+  net.bytebuddy:
+    byte-buddy-agent:
+      version: "1.8.15"
+      lang: scala/unmangled
+    byte-buddy:
+      version: "1.8.15"
+      lang: scala/unmangled
+  org.objenesis:
+    objenesis:
+      version: "2.6"
+      lang: scala/unmangled
+  org.scala-sbt:
+    test-interface:
+      version: "1.0"
+      lang: scala/unmangled
+
+  org.scala-lang.modules:
+    scala-java8-compat:
+      version: "0.8.0"
+      lang: scala
+  org.scalactic:
+    scalactic:
+      version: "3.0.5"
+      lang: scala
+  org.typelevel:
+    macro-compat:
+      version: "1.1.1"
+      lang: scala
 
 replacements:
   org.scala-lang:
@@ -47,11 +83,11 @@ replacements:
       lang: scala/unmangled
       target: "@io_bazel_rules_scala_scala_reflect//:io_bazel_rules_scala_scala_reflect"
 
-  org.scala-lang.modules:
-    scala-parser-combinators:
-      lang: scala
-      target:
-        "@io_bazel_rules_scala_scala_parser_combinators//:io_bazel_rules_scala_scala_parser_combinators"
-    scala-xml:
-      lang: scala
-      target: "@io_bazel_rules_scala_scala_xml//:io_bazel_rules_scala_scala_xml"
+#  org.scala-lang.modules:
+#    scala-parser-combinators:
+#      lang: scala
+#      target:
+#        "@io_bazel_rules_scala_scala_parser_combinators//:io_bazel_rules_scala_scala_parser_combinators"
+#    scala-xml:
+#      lang: scala
+#      target: "@io_bazel_rules_scala_scala_xml//:io_bazel_rules_scala_scala_xml"

@@ -1,8 +1,8 @@
 load("@io_bazel_rules_scala//scala:scala.bzl", "scala_library")
 load("@io_bazel_rules_scala//scala:scala_import.bzl", "scala_import")
-java_library(
+scala_import(
     name = "objenesis_EXT",
-    exports = [
+    jars = [
         "//external:jar/org/objenesis/objenesis"
     ],
     neverlink = 1,
@@ -11,9 +11,9 @@ java_library(
     ]
 )
 
-java_library(
+scala_import(
     name = "objenesis",
-    exports = [
+    jars = [
         "//external:jar/org/objenesis/objenesis"
     ],
     visibility = [

@@ -6,11 +6,6 @@ scala_import(
         "//external:jar/com/typesafe/akka/akka_actor_2_12"
     ],
     neverlink = 1,
-    runtime_deps = [
-        "//3rdparty/jvm/com/typesafe:config",
-        "//3rdparty/jvm/org/scala_lang/modules:scala_java8_compat",
-        "//3rdparty/jvm/org/scala_lang:scala_library"
-    ],
     visibility = [
         "//visibility:public"
     ]
@@ -39,10 +34,6 @@ scala_import(
         "//external:jar/com/typesafe/akka/akka_testkit_2_12"
     ],
     neverlink = 1,
-    runtime_deps = [
-        "//3rdparty/jvm/org/scala_lang:scala_library",
-        ":akka_actor"
-    ],
     visibility = [
         "//visibility:public"
     ]

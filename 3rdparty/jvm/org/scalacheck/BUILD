@@ -6,10 +6,6 @@ scala_import(
         "//external:jar/org/scalacheck/scalacheck_2_12"
     ],
     neverlink = 1,
-    runtime_deps = [
-        "//3rdparty/jvm/org/scala_lang:scala_library",
-        "//3rdparty/jvm/org/scala_sbt:test_interface"
-    ],
     visibility = [
         "//visibility:public"
     ]
