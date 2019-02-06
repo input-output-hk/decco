@@ -9,6 +9,6 @@ scala_library(
 scala_test(
     name = "tests",
     deps = [ "decco",
-             "//main/io/iohk/codecs/nio/test/utils",
+             "//src/io/iohk/codecs/nio/test/utils",
              "//3rdparty/jvm/org/scalacheck:scalacheck" ]
 )

@@ -1,4 +1,4 @@
-package io.iohk.cef.decco
+package io.iohk.decco
 
 import scala.reflect.ClassTag
 
@@ -30,7 +30,7 @@ package object auto {
 
     def size(t: Int): Int = 4
 
-    def decode(start: Int, source: Array[Byte]): io.iohk.cef.decco.DecodeResult[Int] = {
+    def decode(start: Int, source: Array[Byte]): io.iohk.decco.DecodeResult[Int] = {
 
       if (start < 0 || start + 4 >= source.size)
         DecodeResult.Failure

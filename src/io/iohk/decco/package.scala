@@ -1,4 +1,4 @@
-package io.iohk.cef.decco
+package io.iohk.decco
 
 
 sealed trait DecodeResult[+T]
@@ -27,7 +27,7 @@ trait PartialCodec[T] { self =>
       case (t, u) => self.size(t) + that.size(u)
     }
 
-    def decode(start: Int, source: Array[Byte]): io.iohk.cef.decco.DecodeResult[(T, U)] = {
+    def decode(start: Int, source: Array[Byte]): io.iohk.decco.DecodeResult[(T, U)] = {
       self.decode(start, source) match {
         case DecodeResult.Failure => DecodeResult.Failure
         case DecodeResult.Success(t, nextIndex) =>
@@ -38,7 +38,7 @@ trait PartialCodec[T] { self =>
       }
     }
 
-    def encode(tuple: (T, U), start: Int, destination: Array[Byte]): io.iohk.cef.decco.EncodeResult = {
+    def encode(tuple: (T, U), start: Int, destination: Array[Byte]): io.iohk.decco.EncodeResult = {
       val (t, u) = tuple
       val tSize = self.size(t)
       self.encode(t, start, destination) match {
@@ -57,7 +57,7 @@ trait PartialCodec[T] { self =>
         case DecodeResult.Success(t, nextIndex) => DecodeResult.Success(t2u(t), nextIndex)
       }
 
-    def encode(u: U, start: Int, destination: Array[Byte]): io.iohk.cef.decco.EncodeResult =
+    def encode(u: U, start: Int, destination: Array[Byte]): io.iohk.decco.EncodeResult =
       self.encode(u2t(u), start, destination)
   }
 
@@ -72,7 +72,7 @@ final class Codec[T](partial: PartialCodec[T]) {
         r
       case EncodeResult.NotEnoughStorage =>
         throw new RuntimeException(
-          """|FATAL: Trying to encode an entity into an array for which there is not enought space. This should NEVER happen
+          """|FATAL: Trying to encode an entity into an array for which there is not enough space. This should NEVER happen
              |and means that there is a bug in the partial encoder, where the partial encoder is demanding more space than
              |what it has reported it was going to be needed""".stripMargin)
       case EncodeResult.NegativeIndex =>
