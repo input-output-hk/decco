@@ -13,7 +13,7 @@ class CodecSpec extends FlatSpec {
     codec.decode(codec.encode(0)) shouldBe Some(0)
   }
 
-  they should "handle nasty arrays coming off the network" in {
+  they should "figure out the types of arbitrary objects given a map of typeCode -> partial codec " in {
 
   }
 
