@@ -1,8 +1,11 @@
 package io.iohk.decco
 
-import scala.reflect.ClassTag
+import io.iohk.decco.PartialCodec.typeTagCode
 
-package object auto {
+import scala.reflect.ClassTag
+import scala.reflect.runtime.universe.TypeTag
+
+package object auto extends Products {
 
   implicit val BytePartialCodec: PartialCodec[Byte] = new PartialCodec[Byte] {
 
@@ -24,6 +27,7 @@ package object auto {
         EncodeResult.EncodeSuccess
       }
 
+    override val typeCode: String = typeTagCode[Byte]
   }
 
   implicit val IntPartialCodec: PartialCodec[Int] = new PartialCodec[Int] {
@@ -59,6 +63,8 @@ package object auto {
 
         EncodeResult.EncodeSuccess
       }
+
+    override val typeCode: String = typeTagCode[Int]
   }
 
   implicit val IntArrayPartialCodec: PartialCodec[Array[Int]] =
@@ -68,11 +74,11 @@ package object auto {
     buildNativeArrayCodec[Byte]
 
   implicit val StringPartialCodec: PartialCodec[String] =
-    ByteArrayPartialCodec.map[String](bs => new String(bs, "UTF-8"), s => s.getBytes("UTF-8"))
+    ByteArrayPartialCodec.map[String](typeTagCode[String], bs => new String(bs, "UTF-8"), s => s.getBytes("UTF-8"))
 
   // UTILS
 
-  private def buildNativeArrayCodec[T: ClassTag](implicit iCodec: PartialCodec[Int], tCodec: PartialCodec[T]): PartialCodec[Array[T]] =
+  private def buildNativeArrayCodec[T: ClassTag: TypeTag](implicit iCodec: PartialCodec[Int], tCodec: PartialCodec[T]): PartialCodec[Array[T]] =
     new PartialCodec[Array[T]] {
 
       def size(ts: Array[T]): Int = iCodec.size(ts.length) + pureArraySize(ts)
@@ -94,7 +100,8 @@ package object auto {
             otherwise
         }
 
-  }
+      override val typeCode: String = PartialCodec.typeTagCode[Array[T]]
+    }
 
   private def pureArraySize[T](ts: Array[T])(implicit tCodec: PartialCodec[T]): Int =
     ts.headOption match {

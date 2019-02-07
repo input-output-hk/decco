@@ -15,7 +15,9 @@ object EncodeResult {
 }
 
 trait PartialCodec[T] { self =>
+
   def size(t: T): Int
+  def typeCode: String
   def encode(t: T, start: Int, destination: Array[Byte]): EncodeResult
   def decode(start: Int, source: Array[Byte]): DecodeResult[T]
 
@@ -47,9 +49,11 @@ trait PartialCodec[T] { self =>
         case error => error
       }
     }
+
+    override val typeCode: String = this.typeCode.concat(that.typeCode)
   }
 
-  final def map[U](t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
+  final def map[U](uTypeCode: String, t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
     def size(u: U): Int = self.size(u2t(u))
     def decode(start: Int, source: Array[Byte]): DecodeResult[U] =
       self.decode(start, source) match {
@@ -59,9 +63,18 @@ trait PartialCodec[T] { self =>
 
     def encode(u: U, start: Int, destination: Array[Byte]): io.iohk.decco.EncodeResult =
       self.encode(u2t(u), start, destination)
+
+    override val typeCode: String = uTypeCode
   }
 
 }
+
+// Make a codec responsible for framing:
+// * type framing
+// * size framing
+// partial codec could be encoding to json, codec does not care
+// it just gives an array to PartialCodec to encode into then adds its own type and size info
+import scala.reflect.runtime.universe.TypeTag
 
 final class Codec[T](partial: PartialCodec[T]) {
   def encode(t: T): Array[Byte] = {
@@ -90,9 +103,29 @@ final class Codec[T](partial: PartialCodec[T]) {
   }
 }
 
+object PartialCodec {
+  def apply[T](implicit ev: PartialCodec[T]): PartialCodec[T] = ev
+
+  def typeTagCode[T](implicit typeTag: TypeTag[T]): String =
+    typeTag.toString()
+}
+
 object Codec {
+  def apply[T](implicit ev: PartialCodec[T]): Codec[T] = codecFromPartialCodec(ev)
   implicit def codecFromPartialCodec[T](implicit partial: PartialCodec[T]): Codec[T] =
     new Codec(partial)
+
+  // return the typecode embedded in an array.
+  def peekType(source: Array[Byte]): Option[Array[Byte]] = ???
+
+  def peekSize(source: Array[Byte]): Option[Array[Byte]] = ???
+  // pipeline/meta thing
+  // each object is encoded with a type code
+  // the type code is written by codec, not partial codec
+  // when decoding a stream:
+  // we have a map of codecs
+  // we use peek to extract a type code
+  // that type code can be used to find the correct decoder for the current buffer position
 }
 
 /////
