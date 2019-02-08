@@ -117,7 +117,7 @@ package object auto extends Products {
         case None => EncodeResult.EncodeSuccess // The Array is empty, nothing to encode
         case Some(h) =>
           val elementSize = tCodec.size(h)
-          if (start + elementSize * ts.length >= destination.length)
+          if (start + elementSize * ts.length > destination.length)
             EncodeResult.NotEnoughStorage
           else {
             var i = 0
