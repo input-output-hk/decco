@@ -4,7 +4,8 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 import io.iohk.decco.auto._
 import org.scalatest.mockito.MockitoSugar._
-import org.mockito.Mockito.{verify, never}
+import org.scalatest.EitherValues._
+import org.mockito.Mockito.{never, verify}
 import org.mockito.ArgumentMatchers.any
 
 class CodecSpec extends FlatSpec {
@@ -13,16 +14,43 @@ class CodecSpec extends FlatSpec {
 
   they should "encode/decode a byte" in {
     val codec = Codec[Byte]
-    codec.decode(codec.encode(0)) shouldBe Some(0)
+    codec.decode(codec.encode(0)) shouldBe Right(0)
   }
 
   they should "encode/decode a String" in {
     val codec = Codec[String]
     val bytes = codec.encode("string")
-    codec.decode(bytes) shouldBe Some("string")
+    codec.decode(bytes) shouldBe Right("string")
   }
 
-  //
+  they should "reject incorrectly typed buffers with the correct error" in {
+    val codec = Codec[String]
+    val bytes: Array[Byte] = codec.encode("a message")
+    bytes(7) = 0 // corrupt the header's type field
+
+    codec.decode(bytes).left.value shouldBe Codec.BodyWrongType
+  }
+
+  they should "reject incorrectly size buffers with the correct error" in {
+    val codec = Codec[String]
+    val bytes: Array[Byte] = codec.encode("a message")
+    val truncatedBytes: Array[Byte] = truncateBody(bytes)
+
+    codec.decode(truncatedBytes).left.value shouldBe Codec.BodyTooShort
+  }
+
+  private def truncateBody(bytes: Array[Byte]): Array[Byte] = {
+    val (bodySize, bodyType) = Codec.headerPf.decode(0, bytes).right.value.decoded
+    val headerSize = Codec.headerPf.size((bodySize, bodyType))
+    val truncatedBytes = new Array[Byte](headerSize) // just the header size
+    Array.copy(bytes, 0, truncatedBytes, 0, headerSize)
+    truncatedBytes
+  }
+
+  they should "reject improperly formatted headers with the correct error" in {
+    Codec[String].decode(new Array[Byte](0)).left.value shouldBe Codec.HeaderWrongFormat
+  }
+
   case class A(s: String)
 
   case class Wrap[T](t: T)
@@ -46,17 +74,6 @@ class CodecSpec extends FlatSpec {
     verify(unexpectedPf, never()).decode(any(), any())
   }
 
-  def messageWrapper[T](pf: PartialCodec[T])(start: Int, source: Array[Byte]): Unit =
-    pf.decode(start, source)
-
-  they should "should encode A" in {
-
-    val aPf: PartialCodec[A] = PartialCodec[A]
-    val ac = Codec(aPf)
-    val b: Array[Byte] = ac.encode(A("string"))
-    println(b)
-  }
-
   they should "not allow TypeTag implicits to propagate everywhere" in {
 
     def functionInTheNetwork[T: PartialCodec](t: T): T = {
@@ -67,9 +84,12 @@ class CodecSpec extends FlatSpec {
 
       val maybeRestoredFrame = frameCodec.decode(arr)
 
-      maybeRestoredFrame.get.t
+      maybeRestoredFrame.right.value.t
     }
 
     functionInTheNetwork(A("string")) shouldBe A("string")
   }
+
+  private def messageWrapper[T](pf: PartialCodec[T])(start: Int, source: Array[Byte]): Unit =
+    pf.decode(start, source)
 }

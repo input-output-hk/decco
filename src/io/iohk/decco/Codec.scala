@@ -7,28 +7,33 @@ final class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
   import Codec._
 
   def encode(t: T): Array[Byte] = {
-    val headerSize = headerPf.size((0, partial.typeCode))
-    val size: Int = headerSize + partial.size(t)
-    val r = new Array[Byte](size)
-    headerPf.encode((size, partial.typeCode), 0, r)
+    val bodySize = partial.size(t)
+    val header = (bodySize, partial.typeCode)
+    val headerSize = headerPf.size(header)
+    val r = new Array[Byte](bodySize + headerSize)
+    headerPf.encode(header, 0, r)
     partial.encode(t, headerSize, r)
     r
   }
 
-  def decode(source: Array[Byte]): Option[T] = {
+  def decode(source: Array[Byte]): Either[DecodeFailure, T] = {
     headerPf.decode(0, source) match {
       case Left(Failure) =>
-        None
-      case Right(DecodeResult((_, typeField), nextIndex)) =>
+        Left(HeaderWrongFormat)
+      case Right(DecodeResult((sizeField, typeField), nextIndex)) =>
         if (typeField == partial.typeCode)
-          partial.decode(nextIndex, source) match {
-            case Right(DecodeResult(t, _)) =>
-              Some(t)
-            case Left(Failure) =>
-              None
+          if (sizeField <= source.length - nextIndex) {
+            partial.decode(nextIndex, source) match {
+              case Right(DecodeResult(t, _)) =>
+                Right(t)
+              case Left(Failure) =>
+                Left(BodyWrongFormat)
+            }
+          } else {
+            Left(BodyTooShort)
           }
         else
-          None
+          Left(BodyWrongType)
     }
   }
 
@@ -66,4 +71,15 @@ object Codec {
         ()
     }
   }
+
+  sealed trait DecodeFailure
+
+  case object HeaderWrongFormat extends DecodeFailure
+
+  case object BodyTooShort extends DecodeFailure
+
+  case object BodyWrongType extends DecodeFailure
+
+  case object BodyWrongFormat extends DecodeFailure
+
 }
