@@ -63,7 +63,10 @@ trait NativeCodecInstances {
 
   // UTILS
 
-  private def buildNativeArrayCodec[T: ClassTag : TypeTag](implicit iCodec: PartialCodec[Int], tCodec: PartialCodec[T]): PartialCodec[Array[T]] =
+  private def buildNativeArrayCodec[T: ClassTag: TypeTag](
+      implicit iCodec: PartialCodec[Int],
+      tCodec: PartialCodec[T]
+  ): PartialCodec[Array[T]] =
     new PartialCodec[Array[T]] {
 
       def size(ts: Array[T]): Int = iCodec.size(ts.length) + pureArraySize(ts)
@@ -91,7 +94,9 @@ trait NativeCodecInstances {
       case Some(h) => tCodec.size(h) * ts.length
     }
 
-  private def pureArrayEncode[T](ts: Array[T], start: Int, destination: Array[Byte])(implicit tCodec: PartialCodec[T]): Unit = {
+  private def pureArrayEncode[T](ts: Array[T], start: Int, destination: Array[Byte])(
+      implicit tCodec: PartialCodec[T]
+  ): Unit = {
 
     if (ts.length != 0) {
       val elementSize = tCodec.size(ts.head)
@@ -103,8 +108,9 @@ trait NativeCodecInstances {
     }
   }
 
-  private def pureArrayDecode[T: ClassTag](start: Int, source: Array[Byte], count: Int)(implicit tCodec: PartialCodec[T]):
-  Either[Failure, DecodeResult[Array[T]]] = {
+  private def pureArrayDecode[T: ClassTag](start: Int, source: Array[Byte], count: Int)(
+      implicit tCodec: PartialCodec[T]
+  ): Either[Failure, DecodeResult[Array[T]]] = {
     val r = new Array[T](count)
     var i = 0
     var j = start

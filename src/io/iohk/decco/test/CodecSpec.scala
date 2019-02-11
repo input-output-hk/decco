@@ -55,7 +55,6 @@ class CodecSpec extends FlatSpec {
 
   case class Wrap[T](t: T)
 
-
   they should "rehydrate type information from a buffer" in {
 
     val message = Wrap(A("message"))

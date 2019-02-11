@@ -74,4 +74,3 @@ object PartialCodec {
   def typeTagCode[T](implicit typeTag: TypeTag[T]): String =
     typeTag.toString()
 }
-

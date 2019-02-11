@@ -31,8 +31,7 @@ final class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
             }
           } else {
             Left(BodyTooShort)
-          }
-        else
+          } else
           Left(BodyWrongType)
     }
   }
