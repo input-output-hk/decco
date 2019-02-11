@@ -10,5 +10,6 @@ scala_test(
     name = "tests",
     deps = [ "decco",
              "//src/io/iohk/codecs/nio/test/utils",
+             "//3rdparty/jvm/org/mockito:mockito_core",
              "//3rdparty/jvm/org/scalacheck:scalacheck" ]
 )
