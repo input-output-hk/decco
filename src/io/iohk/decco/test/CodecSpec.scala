@@ -69,7 +69,7 @@ class CodecSpec extends FlatSpec {
 
     Codec.decodeFrame(availableCodecs, 0, buffer)
 
-    verify(expectedPf).decode(133, buffer)
+    verify(expectedPf).decode(258, buffer)
     verify(unexpectedPf, never()).decode(any(), any())
   }
 

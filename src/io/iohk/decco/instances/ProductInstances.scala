@@ -1,9 +1,10 @@
-package io.iohk.decco
+package io.iohk.decco.instances
 
+import io.iohk.decco.PartialCodec
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure, typeTagCode}
 import shapeless.{::, Generic, HList, HNil, Lazy}
 
-trait ProductCodecInstances {
+trait ProductInstances {
 
   implicit val hNilPC: PartialCodec[HNil] = new PartialCodec[HNil] {
     override def size(t: HNil): Int = 0
@@ -16,7 +17,7 @@ trait ProductCodecInstances {
       Right(DecodeResult(HNil, start))
   }
 
-  implicit def hListPC[H, T <: HList](implicit hPc: Lazy[PartialCodec[H]], tPc: PartialCodec[T]): PartialCodec[H :: T] =
+  implicit def hConsPC[H, T <: HList](implicit hPc: Lazy[PartialCodec[H]], tPc: PartialCodec[T]): PartialCodec[H :: T] =
     new PartialCodec[H :: T] {
       override def size(ht: H :: T): Int = ht match {
         case h :: t =>
@@ -52,4 +53,4 @@ trait ProductCodecInstances {
   }
 }
 
-object ProductCodecInstances extends ProductCodecInstances
+object ProductInstances extends ProductInstances
