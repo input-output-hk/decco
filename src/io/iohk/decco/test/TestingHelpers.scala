@@ -17,9 +17,7 @@ object TestingHelpers {
 //      Arbitrary(arbitrary[Unit].map(_ => UnexpectedThing()))
 //  }
 
-  def encodeDecodeTest[T](implicit codec: PartialCodec[T],
-      a: Arbitrary[T],
-  ): Unit = {
+  def encodeDecodeTest[T](implicit codec: PartialCodec[T], a: Arbitrary[T]): Unit = {
     forAll(arbitrary[T]) { t =>
       val arr = new Array[Byte](codec.size(t))
       codec.encode(t, 0, arr)

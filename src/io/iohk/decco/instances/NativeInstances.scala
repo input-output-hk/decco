@@ -25,7 +25,9 @@ trait NativeInstances {
       destination(start + 1) = (t     ).asInstanceOf[Byte]
     }
     def doDecode(start: Int, source: Array[Byte]): Short = {
-      (source(start + 0) << 8 | (source(start + 1) & 0xFF)).asInstanceOf[Short]
+      (source(start + 0)          << 8 |
+      (source(start + 1) & 0xFF))
+      .asInstanceOf[Short]
     }
   }
 
