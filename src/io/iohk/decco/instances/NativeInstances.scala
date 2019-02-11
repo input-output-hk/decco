@@ -1,15 +1,10 @@
 package io.iohk.decco.instances
 
 import io.iohk.decco.PartialCodec
-import io.iohk.decco.PartialCodec.{DecodeResult, Failure, typeTagCode}
-
-import scala.reflect.ClassTag
-import scala.reflect.runtime.universe.TypeTag
+import io.iohk.decco.PartialCodec.typeTagCode
 
 // format: off
 trait NativeInstances {
-
-  import NativeInstanceHelpers._
 
   implicit val BytePartialCodec: PartialCodec[Byte] = new NativePartialCodec[Byte](size = 1) {
     def encode(t: Byte, start: Int, destination: Array[Byte]): Unit =
@@ -22,12 +17,13 @@ trait NativeInstances {
   implicit val ShortPartialCodec: PartialCodec[Short] = new NativePartialCodec[Short](size = 2) {
     def encode(t: Short, start: Int, destination: Array[Byte]): Unit = {
       destination(start + 0) = (t >> 8).asInstanceOf[Byte]
-      destination(start + 1) = (t     ).asInstanceOf[Byte]
+      destination(start + 1) = (t).asInstanceOf[Byte]
     }
+
     def doDecode(start: Int, source: Array[Byte]): Short = {
-      (source(start + 0)          << 8 |
-      (source(start + 1) & 0xFF))
-      .asInstanceOf[Short]
+      (source(start + 0) << 8 |
+        (source(start + 1) & 0xFF))
+        .asInstanceOf[Short]
     }
   }
 
@@ -35,14 +31,15 @@ trait NativeInstances {
     def encode(t: Int, start: Int, destination: Array[Byte]): Unit = {
       destination(start + 0) = (t >> 24).asInstanceOf[Byte]
       destination(start + 1) = (t >> 16).asInstanceOf[Byte]
-      destination(start + 2) = (t >>  8).asInstanceOf[Byte]
-      destination(start + 3) = (t      ).asInstanceOf[Byte]
+      destination(start + 2) = (t >> 8).asInstanceOf[Byte]
+      destination(start + 3) = (t).asInstanceOf[Byte]
     }
+
     def doDecode(start: Int, source: Array[Byte]): Int =
-      (source(start + 0)       ) << 24 |
-      (source(start + 1) & 0xFF) << 16 |
-      (source(start + 2) & 0xFF) <<  8 |
-      (source(start + 3) & 0xFF)
+      (source(start + 0)) << 24 |
+        (source(start + 1) & 0xFF) << 16 |
+        (source(start + 2) & 0xFF) << 8 |
+        (source(start + 3) & 0xFF)
   }
 
   implicit val LongPartialCodec: PartialCodec[Long] = new NativePartialCodec[Long](size = 8) {
@@ -53,19 +50,19 @@ trait NativeInstances {
       destination(start + 3) = (l >> 32).asInstanceOf[Byte]
       destination(start + 4) = (l >> 24).asInstanceOf[Byte]
       destination(start + 5) = (l >> 16).asInstanceOf[Byte]
-      destination(start + 6) = (l >>  8).asInstanceOf[Byte]
-      destination(start + 7) = (l      ).asInstanceOf[Byte]
+      destination(start + 6) = (l >> 8).asInstanceOf[Byte]
+      destination(start + 7) = (l).asInstanceOf[Byte]
     }
 
     override def doDecode(start: Int, source: Array[Byte]): Long = {
-      (source(start + 0)       ).asInstanceOf[Long] << 56 |
-      (source(start + 1) & 0xFF).asInstanceOf[Long] << 48 |
-      (source(start + 2) & 0xFF).asInstanceOf[Long] << 40 |
-      (source(start + 3) & 0xFF).asInstanceOf[Long] << 32 |
-      (source(start + 4) & 0xFF).asInstanceOf[Long] << 24 |
-      (source(start + 5) & 0xFF).asInstanceOf[Long] << 16 |
-      (source(start + 6) & 0xFF).asInstanceOf[Long] <<  8 |
-      (source(start + 7) & 0xFF).asInstanceOf[Long]
+      (source(start + 0)).asInstanceOf[Long] << 56 |
+        (source(start + 1) & 0xFF).asInstanceOf[Long] << 48 |
+        (source(start + 2) & 0xFF).asInstanceOf[Long] << 40 |
+        (source(start + 3) & 0xFF).asInstanceOf[Long] << 32 |
+        (source(start + 4) & 0xFF).asInstanceOf[Long] << 24 |
+        (source(start + 5) & 0xFF).asInstanceOf[Long] << 16 |
+        (source(start + 6) & 0xFF).asInstanceOf[Long] << 8 |
+        (source(start + 7) & 0xFF).asInstanceOf[Long]
     }
   }
 
@@ -81,12 +78,12 @@ trait NativeInstances {
 
     override def doDecode(start: Int, source: Array[Byte]): Char = {
       ((source(start + 0) << 8) |
-      (source(start + 1) & 0xff)).asInstanceOf[Char]
+        (source(start + 1) & 0xff)).asInstanceOf[Char]
     }
 
     override def encode(c: Char, start: Int, destination: Array[Byte]): Unit = {
       destination(start + 0) = (c >> 8).asInstanceOf[Byte]
-      destination(start + 1) = (c     ).asInstanceOf[Byte]
+      destination(start + 1) = (c).asInstanceOf[Byte]
     }
   }
 
@@ -107,115 +104,34 @@ trait NativeInstances {
   }
 
   implicit val ByteArrayPartialCodec: PartialCodec[Array[Byte]] =
-    buildNativeArrayCodec[Byte]
+    new ArrayCodec[Byte]
 
   implicit val ShortArrayPartialCodec: PartialCodec[Array[Short]] =
-    buildNativeArrayCodec[Short]
+    new ArrayCodec[Short]
 
   implicit val IntArrayPartialCodec: PartialCodec[Array[Int]] =
-    buildNativeArrayCodec[Int]
+    new ArrayCodec[Int]
 
   implicit val LongArrayPartialCodec: PartialCodec[Array[Long]] =
-    buildNativeArrayCodec[Long]
+    new ArrayCodec[Long]
 
   implicit val FloatArrayPartialCodec: PartialCodec[Array[Float]] =
-    buildNativeArrayCodec[Float]
+    new ArrayCodec[Float]
 
   implicit val DoubleArrayPartialCodec: PartialCodec[Array[Double]] =
-    buildNativeArrayCodec[Double]
+    new ArrayCodec[Double]
 
   implicit val BooleanArrayPartialCodec: PartialCodec[Array[Boolean]] =
-    buildNativeArrayCodec[Boolean]
+    new ArrayCodec[Boolean]
 
   implicit val CharArrayPartialCodec: PartialCodec[Array[Char]] =
-    buildNativeArrayCodec[Char](ClassTag.Char, TypeTag.Char, IntPartialCodec, CharPartialCodec)
+    new ArrayCodec[Char]
 
   implicit val StringPartialCodec: PartialCodec[String] =
     CharArrayPartialCodec.map[String](typeTagCode[String], String.copyValueOf, _.toCharArray)
 
 }
 
-object NativeInstanceHelpers {
-
-  abstract class NativePartialCodec[T: TypeTag](val size: Int) extends PartialCodec[T] {
-    override def size(t: T): Int = size
-
-    override def typeCode: String = typeTagCode[T]
-
-    def doDecode(start: Int, source: Array[Byte]): T
-
-    override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[T]] = {
-      if (start < 0 || start + size > source.length)
-        Left(Failure)
-      else
-        Right(DecodeResult(doDecode(start, source), start + size))
-    }
-  }
-
-  def buildNativeArrayCodec[T: ClassTag : TypeTag](
-                                                             implicit iCodec: PartialCodec[Int],
-                                                             tCodec: PartialCodec[T]
-                                                           ): PartialCodec[Array[T]] =
-    new PartialCodec[Array[T]] {
-
-      def size(ts: Array[T]): Int = iCodec.size(ts.length) + pureArraySize(ts)
-
-      def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[Array[T]]] = {
-        iCodec.decode(start, source) match {
-          case Right(DecodeResult(count, nextIndex)) =>
-            pureArrayDecode(nextIndex, source, count)
-          case Left(Failure) =>
-            Left(Failure)
-        }
-      }
-
-      def encode(ts: Array[T], start: Int, destination: Array[Byte]): Unit = {
-        iCodec.encode(ts.length, start, destination)
-        pureArrayEncode(ts, start + iCodec.size(ts.length), destination)
-      }
-
-      override val typeCode: String = typeTagCode[Array[T]]
-    }
-
-  private def pureArraySize[T](ts: Array[T])(implicit tCodec: PartialCodec[T]): Int =
-    ts.headOption match {
-      case None => 0
-      case Some(h) => tCodec.size(h) * ts.length
-    }
-
-  private def pureArrayEncode[T](ts: Array[T], start: Int, destination: Array[Byte])(
-    implicit tCodec: PartialCodec[T]
-  ): Unit = {
-
-    if (ts.length != 0) {
-      val elementSize = tCodec.size(ts.head)
-
-      ts.foldLeft(start)((iDest, t: T) => {
-        tCodec.encode(t, iDest, destination)
-        iDest + elementSize
-      })
-    }
-  }
-
-  private def pureArrayDecode[T: ClassTag](start: Int, source: Array[Byte], count: Int)(
-    implicit tCodec: PartialCodec[T]
-  ): Either[Failure, DecodeResult[Array[T]]] = {
-    val r = new Array[T](count)
-    var i = 0
-    var j = start
-    while (i < count) {
-      tCodec.decode(j, source) match {
-        case Right(DecodeResult(t, nextJ)) =>
-          r(i) = t
-          j = nextJ
-        case Left(Failure) =>
-          return Left(Failure)
-      }
-      i += 1
-    }
-    Right(DecodeResult(r, j))
-  }
-}
+object NativeInstances extends NativeInstances
 
 // format: on
-object NativeInstances extends NativeInstances
