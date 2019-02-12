@@ -1,11 +1,9 @@
 package io.iohk.decco.instances
 
-import io.iohk.decco.PartialCodec
+import io.iohk.decco.TestingHelpers.partialCodecTest
 import io.iohk.decco.auto._
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FlatSpec
-import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.EitherValues._
-import org.scalatest.Matchers._
 
 class ProductInstancesSpec extends FlatSpec {
   behavior of "Product instances"
@@ -15,64 +13,19 @@ class ProductInstancesSpec extends FlatSpec {
   case class Amber() extends TrafficLight
   case class Green() extends TrafficLight
 
+  implicit val arbitraryTrafficLight: Arbitrary[TrafficLight] = Arbitrary(
+    Gen.oneOf(Red(), Amber(), Green())
+  )
+
   they should "support sealed trait hierarchies" in {
-    val pf = PartialCodec[TrafficLight]
-
-    val lights = Table(
-      "light",
-      Red(),
-      Amber(),
-      Green())
-
-    forAll(lights) { light =>
-      val buffer = new Array[Byte](pf.size(light))
-
-      pf.encode(light, 0, buffer)
-
-      val result = pf.decode(0, buffer).right.value
-
-      result.decoded shouldBe light
-      result.nextIndex shouldBe buffer.length
-    }
+    partialCodecTest[TrafficLight]
   }
 
   they should "support option" in {
-    val pf = PartialCodec[Option[String]]
-
-    val choices = Table(
-      "choice",
-      Some("thing"),
-      None)
-
-    forAll(choices) { choice =>
-      val buffer = new Array[Byte](pf.size(choice))
-
-      pf.encode(choice, 0, buffer)
-
-      val result = pf.decode(0, buffer).right.value
-
-      result.decoded shouldBe choice
-      result.nextIndex shouldBe buffer.length
-    }
+    partialCodecTest[Option[String]]
   }
 
   they should "support Either" in {
-    val pf = PartialCodec[Either[String, Int]]
-
-    val choices = Table(
-      "choice",
-      Left("thing"),
-      Right(10))
-
-    forAll(choices) { choice =>
-      val buffer = new Array[Byte](pf.size(choice))
-
-      pf.encode(choice, 0, buffer)
-
-      val result = pf.decode(0, buffer).right.value
-
-      result.decoded shouldBe choice
-      result.nextIndex shouldBe buffer.length
-    }
+    partialCodecTest[Either[String, Int]]
   }
 }

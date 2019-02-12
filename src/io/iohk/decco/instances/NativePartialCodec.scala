@@ -12,7 +12,7 @@ abstract class NativePartialCodec[T: TypeTag](val size: Int) extends PartialCode
   def doDecode(start: Int, source: Array[Byte]): T
 
   override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[T]] = {
-    if (start < 0 || start + size > source.length)
+    if (start < 0 || start >= source.length || start + size > source.length)
       Left(Failure)
     else
       Right(DecodeResult(doDecode(start, source), start + size))

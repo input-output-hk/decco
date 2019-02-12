@@ -58,10 +58,10 @@ trait ProductInstances {
   }
 
   implicit def cUnionPC[H, T <: Coproduct](
-                                       implicit hPc: Lazy[PartialCodec[H]],
-                                       tPc: PartialCodec[T],
-                                       booleanPc: PartialCodec[Boolean]
-                                       ): PartialCodec[H :+: T] = new PartialCodec[H :+: T] {
+      implicit hPc: Lazy[PartialCodec[H]],
+      tPc: PartialCodec[T],
+      booleanPc: PartialCodec[Boolean]
+  ): PartialCodec[H :+: T] = new PartialCodec[H :+: T] {
 
     override def size(ht: H :+: T): Int = ht match {
       case Inl(h) => booleanPc.size(true) + hPc.value.size(h)
@@ -82,15 +82,13 @@ trait ProductInstances {
       booleanPc.decode(start, source).flatMap { r1: DecodeResult[Boolean] =>
         if (r1.decoded) { // it's l
           hPc.value.decode(r1.nextIndex, source).map(hResult => DecodeResult(Inl(hResult.decoded), hResult.nextIndex))
-        }
-        else // it's r
+        } else // it's r
           tPc.decode(r1.nextIndex, source).map(tResult => DecodeResult(Inr(tResult.decoded), tResult.nextIndex))
       }
     }
 
     override def typeCode: String = s"${hPc.value.typeCode} shapeless.:+: ${tPc.typeCode}"
   }
-
 
   implicit def genericPC[T, R](implicit gen: Generic.Aux[T, R], enc: Lazy[PartialCodec[R]]): PartialCodec[T] = {
     enc.value.mapExplicit[T](s"shapeless.Generic(${enc.value.typeCode}", gen.from, gen.to)
