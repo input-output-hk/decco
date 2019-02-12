@@ -1,28 +1,32 @@
 package io.iohk.decco
 
+import java.nio.ByteBuffer
+
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
-final class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
+abstract class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
 
   import Codec._
 
-  def encode(t: T): Array[Byte] = {
+  def newBuffer(capacity: Int): ByteBuffer
+
+  def encode(t: T): ByteBuffer = {
     val bodySize = partial.size(t)
     val header = (bodySize, partial.typeCode)
     val headerSize = headerPf.size(header)
-    val r = new Array[Byte](bodySize + headerSize)
+    val r = ByteBuffer.allocate(bodySize + headerSize)
     headerPf.encode(header, 0, r)
     partial.encode(t, headerSize, r)
     r
   }
 
-  def decode(source: Array[Byte]): Either[DecodeFailure, T] = {
+  def decode(source: ByteBuffer): Either[DecodeFailure, T] = {
     headerPf.decode(0, source) match {
       case Left(Failure) =>
         Left(HeaderWrongFormat)
       case Right(DecodeResult((sizeField, typeField), nextIndex)) =>
         if (typeField == partial.typeCode)
-          if (sizeField <= source.length - nextIndex) {
+          if (sizeField <= source.remaining - nextIndex) {
             partial.decode(nextIndex, source) match {
               case Right(DecodeResult(t, _)) =>
                 Right(t)
@@ -50,19 +54,22 @@ final class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
 
 object Codec {
 
+  def heapCodec[T](implicit ev: PartialCodec[T]): Codec[T] = new Codec[T](ev) {
+    override def newBuffer(capacity: Int): ByteBuffer = ByteBuffer.allocate(capacity)
+  }
+
+  def directCodec[T](implicit ev: PartialCodec[T]): Codec[T] = new Codec[T](ev) {
+    override def newBuffer(capacity: Int): ByteBuffer = ByteBuffer.allocateDirect(capacity)
+  }
+
   import io.iohk.decco.auto._
 
   val headerPf = PartialCodec[(Int, String)]
 
-  def apply[T](implicit ev: PartialCodec[T]): Codec[T] = codecFromPartialCodec(ev)
-
-  implicit def codecFromPartialCodec[T](implicit partial: PartialCodec[T]): Codec[T] =
-    new Codec(partial)
-
   // 'Rehydrating' function.
   // From a buffer of unknown type, read the typeCode and apply the
   // data to a function that maps to a decoder with the corresponding typeCode.
-  def decodeFrame(decoderWrappers: Map[String, (Int, Array[Byte]) => Unit], start: Int, source: Array[Byte]): Unit = {
+  def decodeFrame(decoderWrappers: Map[String, (Int, ByteBuffer) => Unit], start: Int, source: ByteBuffer): Unit = {
     headerPf.decode(start, source) match {
       case Right(DecodeResult((_, typeField), nextIndex)) =>
         decoderWrappers.get(typeField).foreach(decoderWrapper => decoderWrapper(nextIndex, source))

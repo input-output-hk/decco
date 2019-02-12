@@ -1,5 +1,7 @@
 package io.iohk.decco
 
+import java.nio.ByteBuffer
+
 import scala.reflect.runtime.universe.TypeTag
 
 trait PartialCodec[T] { self =>
@@ -8,8 +10,8 @@ trait PartialCodec[T] { self =>
 
   def size(t: T): Int
   def typeCode: String
-  def encode(t: T, start: Int, destination: Array[Byte]): Unit
-  def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[T]]
+  def encode(t: T, start: Int, destination: ByteBuffer): Unit
+  def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[T]]
 
   // SOME COMPOSITION FUNCTIONS
 
@@ -19,7 +21,7 @@ trait PartialCodec[T] { self =>
       case (t, u) => self.size(t) + that.size(u)
     }
 
-    def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[(T, U)]] = {
+    def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[(T, U)]] = {
       self.decode(start, source) match {
         case Left(Failure) =>
           Left(Failure)
@@ -33,7 +35,7 @@ trait PartialCodec[T] { self =>
       }
     }
 
-    def encode(tuple: (T, U), start: Int, destination: Array[Byte]): Unit = {
+    def encode(tuple: (T, U), start: Int, destination: ByteBuffer): Unit = {
       val (t, u) = tuple
       val tSize = self.size(t)
       self.encode(t, start, destination)
@@ -49,7 +51,7 @@ trait PartialCodec[T] { self =>
 
   final def mapExplicit[U](uTypeCode: String, t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
     def size(u: U): Int = self.size(u2t(u))
-    def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[U]] =
+    def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[U]] =
       self.decode(start, source) match {
         case Left(Failure) =>
           Left(Failure)
@@ -57,7 +59,7 @@ trait PartialCodec[T] { self =>
           Right(DecodeResult(t2u(t), nextIndex))
       }
 
-    def encode(u: U, start: Int, destination: Array[Byte]): Unit =
+    def encode(u: U, start: Int, destination: ByteBuffer): Unit =
       self.encode(u2t(u), start, destination)
 
     override val typeCode: String = uTypeCode

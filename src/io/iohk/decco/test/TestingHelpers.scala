@@ -1,5 +1,7 @@
 package io.iohk.decco
 
+import java.nio.ByteBuffer
+
 import io.iohk.decco.PartialCodec.Failure
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
@@ -17,24 +19,24 @@ object TestingHelpers {
 
   private def encodeDecodeTest[T](implicit codec: PartialCodec[T], a: Arbitrary[T]): Unit = {
     forAll(arbitrary[T]) { t =>
-      val arr = new Array[Byte](codec.size(t))
-      codec.encode(t, 0, arr)
-      val result = codec.decode(0, arr).right.value
+      val buff = ByteBuffer.allocate(codec.size(t))
+      codec.encode(t, 0, buff)
+      val result = codec.decode(0, buff).right.value
       result.decoded shouldBe t
-      result.nextIndex shouldBe arr.length
+      result.nextIndex shouldBe buff.capacity
     }
   }
 
   private def emptyBufferTest[T](implicit codec: PartialCodec[T], a: Arbitrary[T]): Unit = {
-    codec.decode(0, new Array[Byte](0)) shouldBe Left(Failure)
-    codec.decode(1, new Array[Byte](1)) shouldBe Left(Failure)
+    codec.decode(0, ByteBuffer.allocate(0)) shouldBe Left(Failure)
+    codec.decode(1, ByteBuffer.allocate(1)) shouldBe Left(Failure)
   }
 
   private def misalignedBufferTest[T](implicit codec: PartialCodec[T], a: Arbitrary[T]): Unit = {
     forAll(arbitrary[T]) { t =>
-      val arr = new Array[Byte](codec.size(t))
-      codec.encode(t, 0, arr)
-      codec.decode(Int.MaxValue, arr) shouldBe Left(Failure)
+      val buff = ByteBuffer.allocate(codec.size(t))
+      codec.encode(t, 0, buff)
+      codec.decode(Int.MaxValue, buff) shouldBe Left(Failure)
     }
   }
 }

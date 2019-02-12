@@ -22,7 +22,7 @@ class CollectionInstancesSpec extends FlatSpec {
       start <- Gen.choose(0, Int.MaxValue)
       end <- Gen.choose(start, Int.MaxValue)
 
-    } yield Range(start, end, (end - start)/10)
+    } yield Range(start, end, (end - start) / 10)
   )
 
   implicit def arbitraryNumericRange: Arbitrary[NumericRange[Long]] = Arbitrary(
@@ -30,7 +30,7 @@ class CollectionInstancesSpec extends FlatSpec {
       start <- Gen.choose(0, Long.MaxValue)
       end <- Gen.choose(start, Long.MaxValue)
 
-    } yield NumericRange(start, end, (end - start)/10)
+    } yield NumericRange(start, end, (end - start) / 10)
   )
 
   they should "encode and decode collection types" in {

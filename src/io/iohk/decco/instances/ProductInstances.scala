@@ -1,5 +1,7 @@
 package io.iohk.decco.instances
 
+import java.nio.ByteBuffer
+
 import io.iohk.decco.PartialCodec
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure, typeTagCode}
 import shapeless.{:+:, ::, CNil, Coproduct, Generic, HList, HNil, Inl, Inr, Lazy}
@@ -11,9 +13,9 @@ trait ProductInstances {
 
     override val typeCode: String = typeTagCode[HNil]
 
-    override def encode(t: HNil, start: Int, destination: Array[Byte]): Unit = ()
+    override def encode(t: HNil, start: Int, destination: ByteBuffer): Unit = ()
 
-    override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[HNil]] =
+    override def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[HNil]] =
       Right(DecodeResult(HNil, start))
   }
 
@@ -26,14 +28,14 @@ trait ProductInstances {
 
       override val typeCode: String = s"${hPc.value.typeCode} shapeless.:: ${tPc.typeCode}"
 
-      override def encode(ht: H :: T, start: Int, destination: Array[Byte]): Unit = ht match {
+      override def encode(ht: H :: T, start: Int, destination: ByteBuffer): Unit = ht match {
         case h :: t =>
           val hSz = hPc.value.size(h)
           hPc.value.encode(h, start, destination)
           tPc.encode(t, start + hSz, destination)
       }
 
-      override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[H :: T]] = {
+      override def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[H :: T]] = {
         hPc.value.decode(start, source) match {
           case Right(DecodeResult(h, nextIndex)) =>
             tPc.decode(nextIndex, source) match {
@@ -51,9 +53,9 @@ trait ProductInstances {
   implicit val cNilPC: PartialCodec[CNil] = new PartialCodec[CNil] {
     override def size(t: CNil): Int = 0
     override def typeCode: String = typeTagCode[CNil]
-    override def encode(t: CNil, start: Int, destination: Array[Byte]): Unit =
+    override def encode(t: CNil, start: Int, destination: ByteBuffer): Unit =
       throw new UnsupportedOperationException("CNil encoding not defined")
-    override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[CNil]] =
+    override def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[CNil]] =
       Left(Failure)
   }
 
@@ -68,7 +70,7 @@ trait ProductInstances {
       case Inr(t) => booleanPc.size(false) + tPc.size(t)
     }
 
-    override def encode(ht: H :+: T, start: Int, destination: Array[Byte]): Unit = ht match {
+    override def encode(ht: H :+: T, start: Int, destination: ByteBuffer): Unit = ht match {
       case Inl(h) =>
         booleanPc.encode(true, start, destination)
         hPc.value.encode(h, start + booleanPc.size(true), destination)
@@ -77,7 +79,7 @@ trait ProductInstances {
         tPc.encode(t, start + booleanPc.size(false), destination)
     }
 
-    override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[H :+: T]] = {
+    override def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[H :+: T]] = {
 
       booleanPc.decode(start, source).flatMap { r1: DecodeResult[Boolean] =>
         if (r1.decoded) { // it's l

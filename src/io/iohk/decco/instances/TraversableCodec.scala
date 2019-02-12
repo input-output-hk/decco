@@ -1,5 +1,7 @@
 package io.iohk.decco.instances
 
+import java.nio.ByteBuffer
+
 import io.iohk.decco.PartialCodec
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure, typeTagCode}
 
@@ -22,11 +24,11 @@ class TraversableCodec[T: ClassTag: TypeTag, CT: TypeTag](
     itl: IsTraversableLikeAux[T, CT]
 ) extends PartialCodec[CT] {
 
-  override def encode(ts: CT, start: Int, destination: Array[Byte]): Unit = {
+  override def encode(ts: CT, start: Int, destination: ByteBuffer): Unit = {
     encodeHeaderAndBody(toGenTraversable(ts), start, destination)
   }
 
-  override def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[CT]] = {
+  override def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[CT]] = {
     iCodec.decode(start, source) match {
       case Right(DecodeResult(count, nextIndex)) =>
         decodeBody(nextIndex, source, count)
@@ -50,7 +52,7 @@ class TraversableCodec[T: ClassTag: TypeTag, CT: TypeTag](
       acc + elementSize
     })
 
-  private def encodeHeaderAndBody(ts: GenTraversable[T], start: Int, destination: Array[Byte])(
+  private def encodeHeaderAndBody(ts: GenTraversable[T], start: Int, destination: ByteBuffer)(
       implicit tCodec: PartialCodec[T]
   ): Unit = {
 
@@ -65,7 +67,7 @@ class TraversableCodec[T: ClassTag: TypeTag, CT: TypeTag](
     })
   }
 
-  private def decodeBody(start: Int, source: Array[Byte], count: Int)(
+  private def decodeBody(start: Int, source: ByteBuffer, count: Int)(
       implicit tCodec: PartialCodec[T]
   ): Either[Failure, DecodeResult[CT]] = {
 
