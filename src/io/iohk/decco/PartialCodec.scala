@@ -1,5 +1,7 @@
 package io.iohk.decco
 
+import scala.reflect.runtime.universe.TypeTag
+
 trait PartialCodec[T] { self =>
 
   import PartialCodec._
@@ -43,7 +45,9 @@ trait PartialCodec[T] { self =>
     override def toString = s"PartialCodec($typeCode)"
   }
 
-  final def map[U](uTypeCode: String, t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
+  final def map[U: TypeTag](t2u: T => U, u2t: U => T): PartialCodec[U] = mapExplicit(typeTagCode[U], t2u, u2t)
+
+  final def mapExplicit[U](uTypeCode: String, t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
     def size(u: U): Int = self.size(u2t(u))
     def decode(start: Int, source: Array[Byte]): Either[Failure, DecodeResult[U]] =
       self.decode(start, source) match {

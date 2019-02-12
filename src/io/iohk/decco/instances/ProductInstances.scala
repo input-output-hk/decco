@@ -49,7 +49,7 @@ trait ProductInstances {
     }
 
   implicit def genericPC[T, R](implicit gen: Generic.Aux[T, R], enc: Lazy[PartialCodec[R]]): PartialCodec[T] = {
-    enc.value.map[T](s"shapeless.Generic(${enc.value.typeCode}", gen.from, gen.to)
+    enc.value.mapExplicit[T](s"shapeless.Generic(${enc.value.typeCode}", gen.from, gen.to)
   }
 }
 

@@ -1,7 +1,6 @@
 package io.iohk.decco.instances
 
 import io.iohk.decco.PartialCodec
-import io.iohk.decco.PartialCodec.typeTagCode
 
 // format: off
 trait NativeInstances {
@@ -128,7 +127,7 @@ trait NativeInstances {
     new ArrayCodec[Char]
 
   implicit val StringPartialCodec: PartialCodec[String] =
-    CharArrayPartialCodec.map[String](typeTagCode[String], String.copyValueOf, _.toCharArray)
+    CharArrayPartialCodec.map[String](String.copyValueOf, _.toCharArray)
 
 }
 
