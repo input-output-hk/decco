@@ -34,7 +34,6 @@ class CollectionInstancesSpec extends FlatSpec {
   )
 
   they should "encode and decode collection types" in {
-
     // interfaces in the collection hierarchy
     partialCodecTest[Traversable[String]]
     partialCodecTest[Iterable[String]]
@@ -57,9 +56,22 @@ class CollectionInstancesSpec extends FlatSpec {
     partialCodecTest[Stream[String]]
     partialCodecTest[Queue[String]]
 
+    partialCodecTest[String]
+
     partialCodecTest[Range]
     partialCodecTest[NumericRange[Long]]
 
     partialCodecTest[Array[String]]
+  }
+
+  they should "encode and decode native array types" in {
+    partialCodecTest[Array[Byte]]
+    partialCodecTest[Array[Short]]
+    partialCodecTest[Array[Char]]
+    partialCodecTest[Array[Int]]
+    partialCodecTest[Array[Long]]
+    partialCodecTest[Array[Float]]
+    partialCodecTest[Array[Double]]
+    partialCodecTest[Array[Boolean]]
   }
 }

@@ -109,7 +109,8 @@ trait CollectionInstances {
     )
   }
 
-  // String included with natives
+  implicit def StringPartialCodec(implicit pf: PartialCodec[Array[Char]]): PartialCodec[String] =
+    pf.map[String](String.valueOf, _.toCharArray)
 
   //
   // Concrete collection classes: LinearSeqs

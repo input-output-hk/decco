@@ -101,34 +101,6 @@ trait NativeInstances {
     override def doDecode(start: Int, source: Array[Byte]): Double =
       java.lang.Double.longBitsToDouble(LongPartialCodec.asInstanceOf[NativePartialCodec[Long]].doDecode(start, source))
   }
-
-  implicit val ByteArrayPartialCodec: PartialCodec[Array[Byte]] =
-    new ArrayCodec[Byte]
-
-  implicit val ShortArrayPartialCodec: PartialCodec[Array[Short]] =
-    new ArrayCodec[Short]
-
-  implicit val IntArrayPartialCodec: PartialCodec[Array[Int]] =
-    new ArrayCodec[Int]
-
-  implicit val LongArrayPartialCodec: PartialCodec[Array[Long]] =
-    new ArrayCodec[Long]
-
-  implicit val FloatArrayPartialCodec: PartialCodec[Array[Float]] =
-    new ArrayCodec[Float]
-
-  implicit val DoubleArrayPartialCodec: PartialCodec[Array[Double]] =
-    new ArrayCodec[Double]
-
-  implicit val BooleanArrayPartialCodec: PartialCodec[Array[Boolean]] =
-    new ArrayCodec[Boolean]
-
-  implicit val CharArrayPartialCodec: PartialCodec[Array[Char]] =
-    new ArrayCodec[Char]
-
-  implicit val StringPartialCodec: PartialCodec[String] =
-    CharArrayPartialCodec.map[String](String.copyValueOf, _.toCharArray)
-
 }
 
 object NativeInstances extends NativeInstances

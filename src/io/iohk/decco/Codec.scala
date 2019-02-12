@@ -50,9 +50,9 @@ final class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
 
 object Codec {
 
-  import io.iohk.decco.instances.NativeInstances.{IntPartialCodec, StringPartialCodec}
+  import io.iohk.decco.auto._
 
-  val headerPf: PartialCodec[(Int, String)] = IntPartialCodec.zip(StringPartialCodec)
+  val headerPf = PartialCodec[(Int, String)]
 
   def apply[T](implicit ev: PartialCodec[T]): Codec[T] = codecFromPartialCodec(ev)
 
