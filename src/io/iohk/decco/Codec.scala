@@ -54,6 +54,16 @@ abstract class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] 
 
 object Codec {
 
+  /*
+   * From ByteBuffer docs:
+   * A direct byte buffer may be created by invoking the allocateDirect factory method of this class.
+   * The buffers returned by this method typically have somewhat higher allocation and deallocation costs than non-direct buffers.
+   * The contents of direct buffers may reside outside of the normal garbage-collected heap,
+   * and so their impact upon the memory footprint of an application might not be obvious.
+   * It is therefore recommended that direct buffers be allocated primarily for large, long-lived buffers
+   * that are subject to the underlying system's native I/O operations.
+   * In general it is best to allocate direct buffers only when they yield a measureable gain in program performance.
+   */
   def heapCodec[T](implicit ev: PartialCodec[T]): Codec[T] = new Codec[T](ev) {
     override def newBuffer(capacity: Int): ByteBuffer = ByteBuffer.allocate(capacity)
   }
