@@ -1,6 +1,7 @@
 package io.iohk.decco
 
 import java.nio.ByteBuffer
+import java.util.UUID
 
 import io.iohk.decco.Codec.heapCodec
 import org.scalatest.FlatSpec
@@ -9,63 +10,63 @@ import io.iohk.decco.auto._
 import org.scalatest.mockito.MockitoSugar._
 import org.scalatest.EitherValues._
 import org.mockito.Mockito.{never, verify}
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, anyInt, eq => meq}
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary._
+import org.scalatest.prop.GeneratorDrivenPropertyChecks._
 
 class CodecSpec extends FlatSpec {
 
   behavior of "Codecs"
 
-  they should "encode/decode a byte" in {
-    val codec = heapCodec[Byte]
-    codec.decode(codec.encode(0)) shouldBe Right(0)
-  }
-
-  they should "encode/decode a String" in {
-    val codec = heapCodec[String]
-    val bytes = codec.encode("string")
-    codec.decode(bytes) shouldBe Right("string")
-  }
-
-  they should "reject incorrectly typed buffers with the correct error" in {
-    val codec = heapCodec[String]
-    val bytes: ByteBuffer = codec.encode("a message")
-    bytes.put(7, 0) // corrupt the header's type field
-
-    codec.decode(bytes).left.value shouldBe DecodeFailure.BodyWrongType
-  }
-
-  they should "reject incorrectly size buffers with the correct error" in {
-    val codec = heapCodec[String]
-    val bytes: ByteBuffer = codec.encode("a message")
-    val truncatedBytes: ByteBuffer = truncateBody(bytes)
-
-    codec.decode(truncatedBytes).left.value shouldBe DecodeFailure.BodyTooShort
-  }
-
-  they should "reject improperly formatted headers with the correct error" in {
-    heapCodec[String].decode(ByteBuffer.allocate(0)).left.value shouldBe DecodeFailure.HeaderWrongFormat
-  }
-
-  case class A(s: String)
-
+  case class A(s: String, i: Int, l: List[String], u: UUID, f: Float)
   case class Wrap[T](t: T)
 
+  implicit val arbitraryA: Arbitrary[A] = Arbitrary(
+    for {
+      s <- arbitrary[String]
+      i <- arbitrary[Int]
+      l <- arbitrary[List[String]]
+      u <- arbitrary[UUID]
+      f <- arbitrary[Float]
+    } yield A(s, i, l, u, f)
+  )
+
+  implicit val arbitraryWrap: Arbitrary[Wrap[A]] = Arbitrary(arbitraryA.arbitrary.map(a => Wrap(a)))
+
+  they should "work for fixed width types" in {
+    codecTest(heapCodec[Int])
+  }
+
+  they should "work for variable width types" in {
+    codecTest(heapCodec[String])
+  }
+
+  they should "work for collection types" in {
+    codecTest(heapCodec[List[String]])
+  }
+
+  they should "work for user types" in {
+    codecTest(heapCodec[A])
+  }
+
   they should "rehydrate type information from a buffer" in {
+    forAll { message: Wrap[A] =>
 
-    val message = Wrap(A("message"))
-    val messageCodec = heapCodec[Wrap[A]]
-    val buffer: ByteBuffer = messageCodec.encode(message)
-    val expectedPf = mock[PartialCodec[Wrap[A]]]
-    val unexpectedPf = mock[PartialCodec[String]]
-    val availableCodecs = Map[String, (Int, ByteBuffer) => Unit](
-      PartialCodec[String].typeCode -> messageWrapper(unexpectedPf),
-      PartialCodec[Wrap[A]].typeCode -> messageWrapper(expectedPf)
-    )
+      val messageCodec = heapCodec[Wrap[A]]
+      val buffer: ByteBuffer = messageCodec.encode(message)
+      val expectedPf = mock[PartialCodec[Wrap[A]]]
+      val unexpectedPf = mock[PartialCodec[String]]
+      val availableCodecs = Map[String, (Int, ByteBuffer) => Unit](
+        PartialCodec[String].typeCode -> messageWrapper(unexpectedPf),
+        PartialCodec[Wrap[A]].typeCode -> messageWrapper(expectedPf)
+      )
 
-    Codec.decodeFrame(availableCodecs, 0, buffer)
+      Codec.decodeFrame(availableCodecs, 0, buffer)
 
-    verify(expectedPf).decode(258, buffer)
-    verify(unexpectedPf, never()).decode(any(), any())
+      verify(expectedPf).decode(anyInt(), meq(buffer))
+      verify(unexpectedPf, never()).decode(any(), any())
+    }
   }
 
   they should "not allow TypeTag implicits to propagate everywhere" in {
@@ -81,7 +82,8 @@ class CodecSpec extends FlatSpec {
       maybeRestoredFrame.right.value.t
     }
 
-    functionInTheNetwork(A("string")) shouldBe A("string")
+    val a = A("string", 1, List(), UUID.randomUUID(), 1.1F)
+    functionInTheNetwork(a) shouldBe a
   }
 
   they should "support the recovery of backing arrays with heap codec" in {
@@ -91,6 +93,40 @@ class CodecSpec extends FlatSpec {
     val backingArray: Array[Byte] = bytes.array()
 
     codec.decode(ByteBuffer.wrap(backingArray)) shouldBe Right("string")
+  }
+
+
+  private def codecTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {
+    encodeDecodeTest(codec)
+    corruptTypeHeaderTest(codec)
+    truncatedBodyTest(codec)
+    emptyBufferTest(codec)
+  }
+
+  private def encodeDecodeTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {
+    forAll { t: T =>
+      codec.decode(codec.encode(t)) shouldBe Right(t)
+    }
+  }
+
+  private def corruptTypeHeaderTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {
+    forAll { t: T =>
+      val bytes: ByteBuffer = codec.encode(t)
+      bytes.put(7, 0) // corrupt the header's type field
+      codec.decode(bytes).left.value shouldBe DecodeFailure.BodyWrongType
+    }
+  }
+
+  private def truncatedBodyTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {
+    forAll { t: T =>
+      val bytes: ByteBuffer = codec.encode(t)
+      val truncatedBytes: ByteBuffer = truncateBody(bytes)
+      codec.decode(truncatedBytes).left.value shouldBe DecodeFailure.BodyTooShort
+    }
+  }
+
+  private def emptyBufferTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {
+    codec.decode(ByteBuffer.allocate(0)).left.value shouldBe DecodeFailure.HeaderWrongFormat
   }
 
   private def truncateBody(bytes: ByteBuffer): ByteBuffer = {
