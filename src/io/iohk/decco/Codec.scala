@@ -40,7 +40,12 @@ abstract class Codec[T](private val partialCodec: PartialCodec[T]) extends Order
   override def compare(that: Codec[T]): Int =
     this.partialCodec.typeCode.compare(that.partialCodec.typeCode)
 
-  private def decodeBody(source: ByteBuffer, sizeField: Int, typeField: String, nextIndex: Int): Either[DecodeFailure, T] = {
+  private def decodeBody(
+      source: ByteBuffer,
+      sizeField: Int,
+      typeField: String,
+      nextIndex: Int
+  ): Either[DecodeFailure, T] = {
     if (typeField == partialCodec.typeCode) {
       if (sizeField <= source.remaining - nextIndex) {
         partialCodec.decode(nextIndex, source) match {
