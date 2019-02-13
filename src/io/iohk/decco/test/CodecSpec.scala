@@ -52,7 +52,6 @@ class CodecSpec extends FlatSpec {
 
   they should "rehydrate type information from a buffer" in {
     forAll { message: Wrap[A] =>
-
       val messageCodec = heapCodec[Wrap[A]]
       val buffer: ByteBuffer = messageCodec.encode(message)
       val expectedPf = mock[PartialCodec[Wrap[A]]]
@@ -82,7 +81,7 @@ class CodecSpec extends FlatSpec {
       maybeRestoredFrame.right.value.t
     }
 
-    val a = A("string", 1, List(), UUID.randomUUID(), 1.1F)
+    val a = A("string", 1, List(), UUID.randomUUID(), 1.1f)
     functionInTheNetwork(a) shouldBe a
   }
 
@@ -94,7 +93,6 @@ class CodecSpec extends FlatSpec {
 
     codec.decode(ByteBuffer.wrap(backingArray)) shouldBe Right("string")
   }
-
 
   private def codecTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {
     encodeDecodeTest(codec)
