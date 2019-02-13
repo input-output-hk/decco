@@ -11,7 +11,7 @@ import scala.collection.{LinearSeq, SortedMap, SortedSet}
 
 class CollectionInstancesSpec extends FlatSpec {
 
-  behavior of "ArrayInstances"
+  behavior of "CollectionInstances"
 
   case class A(s: String)
 
@@ -19,7 +19,7 @@ class CollectionInstancesSpec extends FlatSpec {
 
   implicit val arbitraryRange: Arbitrary[Range] = Arbitrary(
     for {
-      start <- Gen.choose(0, Int.MaxValue)
+      start <- Gen.choose(Int.MinValue, Int.MaxValue)
       end <- Gen.choose(start, Int.MaxValue)
 
     } yield Range(start, end, (end - start) / 10)
@@ -27,7 +27,7 @@ class CollectionInstancesSpec extends FlatSpec {
 
   implicit def arbitraryNumericRange: Arbitrary[NumericRange[Long]] = Arbitrary(
     for {
-      start <- Gen.choose(0, Long.MaxValue)
+      start <- Gen.choose(Long.MinValue, Long.MaxValue)
       end <- Gen.choose(start, Long.MaxValue)
 
     } yield NumericRange(start, end, (end - start) / 10)
@@ -55,8 +55,6 @@ class CollectionInstancesSpec extends FlatSpec {
     partialCodecTest[List[String]]
     partialCodecTest[Stream[String]]
     partialCodecTest[Queue[String]]
-
-    partialCodecTest[String]
 
     partialCodecTest[Range]
     partialCodecTest[NumericRange[Long]]

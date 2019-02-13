@@ -31,7 +31,7 @@ class CodecSpec extends FlatSpec {
     val bytes: ByteBuffer = codec.encode("a message")
     bytes.put(7, 0) // corrupt the header's type field
 
-    codec.decode(bytes).left.value shouldBe Codec.BodyWrongType
+    codec.decode(bytes).left.value shouldBe DecodeFailure.BodyWrongType
   }
 
   they should "reject incorrectly size buffers with the correct error" in {
@@ -39,11 +39,11 @@ class CodecSpec extends FlatSpec {
     val bytes: ByteBuffer = codec.encode("a message")
     val truncatedBytes: ByteBuffer = truncateBody(bytes)
 
-    codec.decode(truncatedBytes).left.value shouldBe Codec.BodyTooShort
+    codec.decode(truncatedBytes).left.value shouldBe DecodeFailure.BodyTooShort
   }
 
   they should "reject improperly formatted headers with the correct error" in {
-    heapCodec[String].decode(ByteBuffer.allocate(0)).left.value shouldBe Codec.HeaderWrongFormat
+    heapCodec[String].decode(ByteBuffer.allocate(0)).left.value shouldBe DecodeFailure.HeaderWrongFormat
   }
 
   case class A(s: String)
@@ -94,8 +94,8 @@ class CodecSpec extends FlatSpec {
   }
 
   private def truncateBody(bytes: ByteBuffer): ByteBuffer = {
-    val (bodySize, bodyType) = Codec.headerPf.decode(0, bytes).right.value.decoded
-    val headerSize = Codec.headerPf.size((bodySize, bodyType))
+    val (bodySize, bodyType) = Codec.headerCodec.decode(0, bytes).right.value.decoded
+    val headerSize = Codec.headerCodec.size((bodySize, bodyType))
     val truncatedBytes = new Array[Byte](headerSize) // just the header size
     Array.copy(bytes.array(), 0, truncatedBytes, 0, headerSize)
     ByteBuffer.wrap(truncatedBytes)

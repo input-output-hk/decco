@@ -56,7 +56,7 @@ class OtherInstancesSpec extends FlatSpec {
   implicit val arbitraryInetSocketAddress: Arbitrary[InetSocketAddress] = Arbitrary(
     for {
       s <- arbitrary[String]
-      i <- Gen.choose[Int](80, 8888)
+      i <- Gen.choose[Int](0, 65535)
     } yield InetSocketAddress.createUnresolved(s, i)
   )
 

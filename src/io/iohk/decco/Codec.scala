@@ -4,52 +4,58 @@ import java.nio.ByteBuffer
 
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
-abstract class Codec[T](val partial: PartialCodec[T]) extends Ordered[Codec[T]] {
+abstract class Codec[T](private val partialCodec: PartialCodec[T]) extends Ordered[Codec[T]] {
 
   import Codec._
+  import DecodeFailure._
 
   def newBuffer(capacity: Int): ByteBuffer
 
   def encode(t: T): ByteBuffer = {
-    val bodySize = partial.size(t)
-    val header = (bodySize, partial.typeCode)
-    val headerSize = headerPf.size(header)
+    val bodySize = partialCodec.size(t)
+    val header = (bodySize, partialCodec.typeCode)
+    val headerSize = headerCodec.size(header)
     val r = ByteBuffer.allocate(bodySize + headerSize)
-    headerPf.encode(header, 0, r)
-    partial.encode(t, headerSize, r)
+    headerCodec.encode(header, 0, r)
+    partialCodec.encode(t, headerSize, r)
     r
   }
 
   def decode(source: ByteBuffer): Either[DecodeFailure, T] = {
-    headerPf.decode(0, source) match {
+    headerCodec.decode(0, source) match {
       case Left(Failure) =>
         Left(HeaderWrongFormat)
       case Right(DecodeResult((sizeField, typeField), nextIndex)) =>
-        if (typeField == partial.typeCode)
-          if (sizeField <= source.remaining - nextIndex) {
-            partial.decode(nextIndex, source) match {
-              case Right(DecodeResult(t, _)) =>
-                Right(t)
-              case Left(Failure) =>
-                Left(BodyWrongFormat)
-            }
-          } else {
-            Left(BodyTooShort)
-          } else
-          Left(BodyWrongType)
+        decodeBody(source, sizeField, typeField, nextIndex)
     }
   }
 
-  override def hashCode(): Int = this.partial.typeCode.hashCode
+  override def hashCode(): Int = this.partialCodec.typeCode.hashCode
 
   override def equals(obj: Any): Boolean = obj match {
-    case that: Codec[T] => this.partial.typeCode == that.partial.typeCode
+    case that: Codec[T] => this.partialCodec.typeCode == that.partialCodec.typeCode
     case _ => false
   }
 
   override def compare(that: Codec[T]): Int =
-    this.partial.typeCode.compare(that.partial.typeCode)
+    this.partialCodec.typeCode.compare(that.partialCodec.typeCode)
 
+  private def decodeBody(source: ByteBuffer, sizeField: Int, typeField: String, nextIndex: Int): Either[DecodeFailure, T] = {
+    if (typeField == partialCodec.typeCode) {
+      if (sizeField <= source.remaining - nextIndex) {
+        partialCodec.decode(nextIndex, source) match {
+          case Right(DecodeResult(t, _)) =>
+            Right(t)
+          case Left(Failure) =>
+            Left(BodyWrongFormat)
+        }
+      } else {
+        Left(BodyTooShort)
+      }
+    } else {
+      Left(BodyWrongType)
+    }
+  }
 }
 
 object Codec {
@@ -74,28 +80,17 @@ object Codec {
 
   import io.iohk.decco.auto._
 
-  val headerPf = PartialCodec[(Int, String)]
+  private[decco] val headerCodec = PartialCodec[(Int, String)]
 
   // 'Rehydrating' function.
   // From a buffer of unknown type, read the typeCode and apply the
   // data to a function that maps to a decoder with the corresponding typeCode.
   def decodeFrame(decoderWrappers: Map[String, (Int, ByteBuffer) => Unit], start: Int, source: ByteBuffer): Unit = {
-    headerPf.decode(start, source) match {
+    headerCodec.decode(start, source) match {
       case Right(DecodeResult((_, typeField), nextIndex)) =>
         decoderWrappers.get(typeField).foreach(decoderWrapper => decoderWrapper(nextIndex, source))
       case _ =>
         ()
     }
   }
-
-  sealed trait DecodeFailure
-
-  case object HeaderWrongFormat extends DecodeFailure
-
-  case object BodyTooShort extends DecodeFailure
-
-  case object BodyWrongType extends DecodeFailure
-
-  case object BodyWrongFormat extends DecodeFailure
-
 }
