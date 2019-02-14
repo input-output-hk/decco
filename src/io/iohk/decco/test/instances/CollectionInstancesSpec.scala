@@ -33,6 +33,11 @@ class CollectionInstancesSpec extends FlatSpec {
     } yield NumericRange(start, end, (end - start) / 10)
   )
 
+  they should "work for this case" in {
+    partialCodecTest[A]
+    partialCodecTest[Map[A, A]]
+  }
+
   they should "encode and decode collection types" in {
     // interfaces in the collection hierarchy
     partialCodecTest[Traversable[String]]

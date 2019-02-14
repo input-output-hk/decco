@@ -3,12 +3,10 @@ package io.iohk.decco.instances
 import java.nio.ByteBuffer
 
 import io.iohk.decco.PartialCodec
-import io.iohk.decco.PartialCodec.{DecodeResult, Failure, typeTagCode}
+import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
 import scala.collection.generic.{CanBuildFrom, IsTraversableLike}
 import scala.collection.{GenTraversable, mutable}
-import scala.reflect.ClassTag
-import scala.reflect.runtime.universe.TypeTag
 
 object TraversableCodec {
   type IsTraversableLikeAux[AA, R] = IsTraversableLike[R] { type A = AA }
@@ -16,7 +14,7 @@ object TraversableCodec {
 
 import io.iohk.decco.instances.TraversableCodec._
 
-class TraversableCodec[T: ClassTag: TypeTag, CT: TypeTag](
+class TraversableCodec[T, CT](val typeCode: String)(
     implicit
     iCodec: PartialCodec[Int],
     tCodec: PartialCodec[T],
@@ -37,7 +35,7 @@ class TraversableCodec[T: ClassTag: TypeTag, CT: TypeTag](
     }
   }
 
-  override val typeCode: String = typeTagCode[CT]
+//  override val typeCode: String = typeTagCode[CT]
 
   override def size(ts: CT): Int = {
     val gt = toGenTraversable(ts)
