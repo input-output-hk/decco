@@ -111,7 +111,7 @@ class CodecSpec extends FlatSpec {
     forAll { t: T =>
       val bytes: ByteBuffer = codec.encode(t)
       bytes.put(7, 0) // corrupt the header's type field
-      codec.decode(bytes).left.value shouldBe DecodeFailure.BodyWrongType
+      codec.decode(bytes).left.value shouldBe a[DecodeFailure.BodyWrongType]
     }
   }
 
@@ -119,7 +119,7 @@ class CodecSpec extends FlatSpec {
     forAll { t: T =>
       val bytes: ByteBuffer = codec.encode(t)
       val truncatedBytes: ByteBuffer = truncateBody(bytes)
-      codec.decode(truncatedBytes).left.value shouldBe DecodeFailure.BodyTooShort
+      codec.decode(truncatedBytes).left.value shouldBe a[DecodeFailure.BodyTooShort]
     }
   }
 

@@ -55,10 +55,10 @@ abstract class Codec[T](private val partialCodec: PartialCodec[T]) extends Order
             Left(BodyWrongFormat)
         }
       } else {
-        Left(BodyTooShort)
+        Left(BodyTooShort(source.remaining - nextIndex, sizeField))
       }
     } else {
-      Left(BodyWrongType)
+      Left(BodyWrongType(partialCodec.typeCode, typeField))
     }
   }
 }
