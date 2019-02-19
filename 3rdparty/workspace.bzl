@@ -43,7 +43,7 @@ def maven_dependencies():
   )
 
   java_import_external(
-      name = "org___scalactic_and_scalactic__2___12",
+      name = "org___scalactic_and_scalactic__2___12_EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
           "https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.5/scalactic_2.12-3.0.5.jar"
@@ -52,7 +52,7 @@ def maven_dependencies():
       neverlink=0
   )
   java_import_external(
-      name = "org___scalactic_and_scalactic__2___12__NEVERLINK",
+      name = "org___scalactic_and_scalactic__2___12_EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
           "https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.5/scalactic_2.12-3.0.5.jar"
@@ -138,7 +138,7 @@ def maven_dependencies():
   )
 
   java_import_external(
-      name = "com___chuusai_and_shapeless__2___12",
+      name = "com___chuusai_and_shapeless__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
           "https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.3/shapeless_2.12-2.3.3.jar"
@@ -147,7 +147,7 @@ def maven_dependencies():
       neverlink=0
   )
   java_import_external(
-      name = "com___chuusai_and_shapeless__2___12__NEVERLINK",
+      name = "com___chuusai_and_shapeless__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
           "https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.3/shapeless_2.12-2.3.3.jar"

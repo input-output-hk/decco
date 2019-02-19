@@ -11,6 +11,9 @@ _default_scalac_jvm_flags = [
     "-XX:MaxMetaspaceSize=512m",
 ]
 
+def _distinct(items):
+  return depset(items).to_list()
+
 def _asNeverlink(label):
   if ":" in label:
     idx = label.rindex(":")
@@ -34,10 +37,12 @@ def _scala_library_impl(name, srcs, deps, external, scalac_jvm_flags, visibility
              for dep in dependencies(ext, neverlink)]
     realname = ("%s_EXT" % name) if neverlink else name
     realdeps = _asNeverlinks(deps) if neverlink else deps
+    calculated_deps = _distinct(realdeps + allexternal)
+    calculated_exports = _distinct(allexternal)
     native_scala_library(
         name = realname,
-        deps = realdeps + allexternal,
-        exports = allexternal,
+        deps = calculated_deps,
+        exports = calculated_exports,
         srcs = native.glob(["**/*.scala"], exclude = ["test/**/*"]) if srcs == None else srcs,
         scalac_jvm_flags = scalac_jvm_flags,
         visibility = visibility,
@@ -57,9 +62,13 @@ def scala_library(name, srcs = None, deps = [], external = [], scalac_jvm_flags 
         scalac_jvm_flags = scalac_jvm_flags,       visibility = visibility,
         neverlink        = True,                   **kwargs
     )
+    allexternal = [dep
+             for ext in external
+             for dep in dependencies(ext, False)]
+    realdeps = deps
     scala_repl(
         name             = "%s_repl" % name,
-        deps             = deps + [name],
+        deps             = _distinct(realdeps + allexternal + [name]),
         scalac_jvm_flags = scalac_jvm_flags,
     )
 
@@ -70,7 +79,7 @@ def _scala_binary_impl(name, main_class, srcs, deps, external, scalac_jvm_flags,
     realname= ("%s_EXT" % name) if neverlink else name
     native_scala_binary(
         name = realname,
-        deps = deps + allexternal,
+        deps = _distinct(deps + allexternal),
         srcs = native.glob(["**/*.scala"], exclude = ["test/**/*"]) if srcs == None else srcs,
         scalac_jvm_flags = scalac_jvm_flags,
         main_class = main_class,
@@ -99,16 +108,22 @@ def scala_binary(name, main_class, srcs = None, deps = [], external = [], scalac
         neverlink = False,
         **kwargs
     )
+    allexternal = [dep
+             for ext in external
+             for dep in dependencies(ext, False)]
     scala_repl(
         name = "%s_repl" % name,
-        deps = deps + ["__%s_binary_lib" % name],
+        deps = _distinct(deps + allexternal + ["__%s_binary_lib" % name]),
         scalac_jvm_flags = scalac_jvm_flags,
     )
 
-def scala_test(name, srcs = None, deps = [], resources = None, scalac_jvm_flags = _default_scalac_jvm_flags, **kwargs):
+def scala_test(name, srcs = None, deps = [], external = [], resources = None, scalac_jvm_flags = _default_scalac_jvm_flags, **kwargs):
+    allexternal = [dep
+             for ext in external
+             for dep in dependencies(ext, False)]
     native_scala_test(
         name = name,
-        deps = deps,
+        deps = _distinct(deps + allexternal),
         resources = native.glob(["test-resources/**/*"]) if resources == None else resources,
         srcs = native.glob(["test/**/*.scala"]) if srcs == None else srcs,
         scalac_jvm_flags = scalac_jvm_flags,
