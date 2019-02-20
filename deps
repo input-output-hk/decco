@@ -3,7 +3,7 @@
 ROOT=`pwd`
 
 BAZEL_DEPS_REPO="https://github.com/marcesquerra/bazel-deps.git"
-BAZEL_DEPS_COMMIT="71fb71a6243095259587ecec88feffd238a04764"
+BAZEL_DEPS_COMMIT="7c4d92bf84479db295e62ff083b755a388d8d714"
 IDENTIFIER="$BAZEL_DEPS_REPO|$BAZEL_DEPS_COMMIT"
 
 BAZEL_DEPS="/tmp/$(echo "$IDENTIFIER" | sha256sum | awk '{ print $1 }')/.bazel-deps/"

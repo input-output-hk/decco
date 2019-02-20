@@ -5,59 +5,40 @@ load("@bazel_tools//tools/build_defs/repo:java.bzl", "java_import_external")
 
 def maven_dependencies():
   java_import_external(
-      name = "org___scala_ds_lang___modules_and_scala_ds_java8_ds_compat__2___12",
+      name = "com___chuusai_and_shapeless__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/org/scala-lang/modules/scala-java8-compat_2.12/0.8.0/scala-java8-compat_2.12-0.8.0.jar"
+          "https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.3/shapeless_2.12-2.3.3.jar"
       ],
-      jar_sha256 = "d9d5dfd1bc49a8158e6e0a90b2ed08fa602984d815c00af16cec53557e83ef8e",
+      jar_sha256 = "312e301432375132ab49592bd8d22b9cd42a338a6300c6157fb4eafd1e3d5033",
       neverlink=0
   )
   java_import_external(
-      name = "org___scala_ds_lang___modules_and_scala_ds_java8_ds_compat__2___12__NEVERLINK",
+      name = "com___chuusai_and_shapeless__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/org/scala-lang/modules/scala-java8-compat_2.12/0.8.0/scala-java8-compat_2.12-0.8.0.jar"
+          "https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.3/shapeless_2.12-2.3.3.jar"
       ],
-      jar_sha256 = "d9d5dfd1bc49a8158e6e0a90b2ed08fa602984d815c00af16cec53557e83ef8e",
+      jar_sha256 = "312e301432375132ab49592bd8d22b9cd42a338a6300c6157fb4eafd1e3d5033",
       neverlink=1
   )
 
   java_import_external(
-      name = "com___typesafe___akka_and_akka_ds_testkit__2___12",
+      name = "org___scalatest_and_scalatest__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-testkit_2.12/2.5.12/akka-testkit_2.12-2.5.12.jar"
+          "https://repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.5/scalatest_2.12-3.0.5.jar"
       ],
-      jar_sha256 = "c36f58fe1f5fa574b9795c9457b07da068ecdf2a60b3ef85f1e6a4434cc4b26e",
+      jar_sha256 = "b416b5bcef6720da469a8d8a5726e457fc2d1cd5d316e1bc283aa75a2ae005e5",
       neverlink=0
   )
   java_import_external(
-      name = "com___typesafe___akka_and_akka_ds_testkit__2___12__NEVERLINK",
+      name = "org___scalatest_and_scalatest__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-testkit_2.12/2.5.12/akka-testkit_2.12-2.5.12.jar"
+          "https://repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.5/scalatest_2.12-3.0.5.jar"
       ],
-      jar_sha256 = "c36f58fe1f5fa574b9795c9457b07da068ecdf2a60b3ef85f1e6a4434cc4b26e",
-      neverlink=1
-  )
-
-  java_import_external(
-      name = "org___scalactic_and_scalactic__2___12_EXTERNAL",
-      licenses = ["notice"],
-      jar_urls = [
-          "https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.5/scalactic_2.12-3.0.5.jar"
-      ],
-      jar_sha256 = "57e25b4fd969b1758fe042595112c874dfea99dca5cc48eebe07ac38772a0c41",
-      neverlink=0
-  )
-  java_import_external(
-      name = "org___scalactic_and_scalactic__2___12_EXTERNAL__NEVERLINK",
-      licenses = ["notice"],
-      jar_urls = [
-          "https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.5/scalactic_2.12-3.0.5.jar"
-      ],
-      jar_sha256 = "57e25b4fd969b1758fe042595112c874dfea99dca5cc48eebe07ac38772a0c41",
+      jar_sha256 = "b416b5bcef6720da469a8d8a5726e457fc2d1cd5d316e1bc283aa75a2ae005e5",
       neverlink=1
   )
 
@@ -138,40 +119,40 @@ def maven_dependencies():
   )
 
   java_import_external(
-      name = "com___chuusai_and_shapeless__2___12__EXTERNAL",
+      name = "org___scalacheck_and_scalacheck__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.3/shapeless_2.12-2.3.3.jar"
+          "https://repo1.maven.org/maven2/org/scalacheck/scalacheck_2.12/1.14.0/scalacheck_2.12-1.14.0.jar"
       ],
-      jar_sha256 = "312e301432375132ab49592bd8d22b9cd42a338a6300c6157fb4eafd1e3d5033",
+      jar_sha256 = "1e6f5b292bb74b03be74195047816632b7d95e40e7f9c13d5d2c53bafeece62e",
       neverlink=0
   )
   java_import_external(
-      name = "com___chuusai_and_shapeless__2___12__EXTERNAL__NEVERLINK",
+      name = "org___scalacheck_and_scalacheck__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/com/chuusai/shapeless_2.12/2.3.3/shapeless_2.12-2.3.3.jar"
+          "https://repo1.maven.org/maven2/org/scalacheck/scalacheck_2.12/1.14.0/scalacheck_2.12-1.14.0.jar"
       ],
-      jar_sha256 = "312e301432375132ab49592bd8d22b9cd42a338a6300c6157fb4eafd1e3d5033",
+      jar_sha256 = "1e6f5b292bb74b03be74195047816632b7d95e40e7f9c13d5d2c53bafeece62e",
       neverlink=1
   )
 
   java_import_external(
-      name = "org___scalacheck_and_scalacheck__2___12",
+      name = "org___typelevel_and_macro_ds_compat__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/org/scalacheck/scalacheck_2.12/1.14.0/scalacheck_2.12-1.14.0.jar"
+          "https://repo1.maven.org/maven2/org/typelevel/macro-compat_2.12/1.1.1/macro-compat_2.12-1.1.1.jar"
       ],
-      jar_sha256 = "1e6f5b292bb74b03be74195047816632b7d95e40e7f9c13d5d2c53bafeece62e",
+      jar_sha256 = "8b1514ec99ac9c7eded284367b6c9f8f17a097198a44e6f24488706d66bbd2b8",
       neverlink=0
   )
   java_import_external(
-      name = "org___scalacheck_and_scalacheck__2___12__NEVERLINK",
+      name = "org___typelevel_and_macro_ds_compat__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/org/scalacheck/scalacheck_2.12/1.14.0/scalacheck_2.12-1.14.0.jar"
+          "https://repo1.maven.org/maven2/org/typelevel/macro-compat_2.12/1.1.1/macro-compat_2.12-1.1.1.jar"
       ],
-      jar_sha256 = "1e6f5b292bb74b03be74195047816632b7d95e40e7f9c13d5d2c53bafeece62e",
+      jar_sha256 = "8b1514ec99ac9c7eded284367b6c9f8f17a097198a44e6f24488706d66bbd2b8",
       neverlink=1
   )
 
@@ -195,7 +176,7 @@ def maven_dependencies():
   )
 
   java_import_external(
-      name = "org___scala_ds_lang___modules_and_scala_ds_xml__2___12",
+      name = "org___scala_ds_lang___modules_and_scala_ds_xml__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
           "https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar"
@@ -204,31 +185,12 @@ def maven_dependencies():
       neverlink=0
   )
   java_import_external(
-      name = "org___scala_ds_lang___modules_and_scala_ds_xml__2___12__NEVERLINK",
+      name = "org___scala_ds_lang___modules_and_scala_ds_xml__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
           "https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.12/1.0.6/scala-xml_2.12-1.0.6.jar"
       ],
       jar_sha256 = "7cc3b6ceb56e879cb977e8e043f4bfe2e062f78795efd7efa09f85003cb3230a",
-      neverlink=1
-  )
-
-  java_import_external(
-      name = "org___scalatest_and_scalatest__2___12",
-      licenses = ["notice"],
-      jar_urls = [
-          "https://repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.5/scalatest_2.12-3.0.5.jar"
-      ],
-      jar_sha256 = "b416b5bcef6720da469a8d8a5726e457fc2d1cd5d316e1bc283aa75a2ae005e5",
-      neverlink=0
-  )
-  java_import_external(
-      name = "org___scalatest_and_scalatest__2___12__NEVERLINK",
-      licenses = ["notice"],
-      jar_urls = [
-          "https://repo1.maven.org/maven2/org/scalatest/scalatest_2.12/3.0.5/scalatest_2.12-3.0.5.jar"
-      ],
-      jar_sha256 = "b416b5bcef6720da469a8d8a5726e457fc2d1cd5d316e1bc283aa75a2ae005e5",
       neverlink=1
   )
 
@@ -252,6 +214,63 @@ def maven_dependencies():
   )
 
   java_import_external(
+      name = "org___scalactic_and_scalactic__2___12__EXTERNAL",
+      licenses = ["notice"],
+      jar_urls = [
+          "https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.5/scalactic_2.12-3.0.5.jar"
+      ],
+      jar_sha256 = "57e25b4fd969b1758fe042595112c874dfea99dca5cc48eebe07ac38772a0c41",
+      neverlink=0
+  )
+  java_import_external(
+      name = "org___scalactic_and_scalactic__2___12__EXTERNAL__NEVERLINK",
+      licenses = ["notice"],
+      jar_urls = [
+          "https://repo1.maven.org/maven2/org/scalactic/scalactic_2.12/3.0.5/scalactic_2.12-3.0.5.jar"
+      ],
+      jar_sha256 = "57e25b4fd969b1758fe042595112c874dfea99dca5cc48eebe07ac38772a0c41",
+      neverlink=1
+  )
+
+  java_import_external(
+      name = "com___typesafe___akka_and_akka_ds_actor__2___12__EXTERNAL",
+      licenses = ["notice"],
+      jar_urls = [
+          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.12/2.5.12/akka-actor_2.12-2.5.12.jar"
+      ],
+      jar_sha256 = "5f766c5cefe013ca21e52fb17e5c0e2a693ca4e5261f575112d169540823f661",
+      neverlink=0
+  )
+  java_import_external(
+      name = "com___typesafe___akka_and_akka_ds_actor__2___12__EXTERNAL__NEVERLINK",
+      licenses = ["notice"],
+      jar_urls = [
+          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.12/2.5.12/akka-actor_2.12-2.5.12.jar"
+      ],
+      jar_sha256 = "5f766c5cefe013ca21e52fb17e5c0e2a693ca4e5261f575112d169540823f661",
+      neverlink=1
+  )
+
+  java_import_external(
+      name = "com___typesafe___akka_and_akka_ds_testkit__2___12__EXTERNAL",
+      licenses = ["notice"],
+      jar_urls = [
+          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-testkit_2.12/2.5.12/akka-testkit_2.12-2.5.12.jar"
+      ],
+      jar_sha256 = "c36f58fe1f5fa574b9795c9457b07da068ecdf2a60b3ef85f1e6a4434cc4b26e",
+      neverlink=0
+  )
+  java_import_external(
+      name = "com___typesafe___akka_and_akka_ds_testkit__2___12__EXTERNAL__NEVERLINK",
+      licenses = ["notice"],
+      jar_urls = [
+          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-testkit_2.12/2.5.12/akka-testkit_2.12-2.5.12.jar"
+      ],
+      jar_sha256 = "c36f58fe1f5fa574b9795c9457b07da068ecdf2a60b3ef85f1e6a4434cc4b26e",
+      neverlink=1
+  )
+
+  java_import_external(
       name = "net___bytebuddy_and_byte_ds_buddy",
       licenses = ["notice"],
       jar_urls = [
@@ -271,40 +290,21 @@ def maven_dependencies():
   )
 
   java_import_external(
-      name = "org___typelevel_and_macro_ds_compat__2___12",
+      name = "org___scala_ds_lang___modules_and_scala_ds_java8_ds_compat__2___12__EXTERNAL",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/org/typelevel/macro-compat_2.12/1.1.1/macro-compat_2.12-1.1.1.jar"
+          "https://repo1.maven.org/maven2/org/scala-lang/modules/scala-java8-compat_2.12/0.8.0/scala-java8-compat_2.12-0.8.0.jar"
       ],
-      jar_sha256 = "8b1514ec99ac9c7eded284367b6c9f8f17a097198a44e6f24488706d66bbd2b8",
+      jar_sha256 = "d9d5dfd1bc49a8158e6e0a90b2ed08fa602984d815c00af16cec53557e83ef8e",
       neverlink=0
   )
   java_import_external(
-      name = "org___typelevel_and_macro_ds_compat__2___12__NEVERLINK",
+      name = "org___scala_ds_lang___modules_and_scala_ds_java8_ds_compat__2___12__EXTERNAL__NEVERLINK",
       licenses = ["notice"],
       jar_urls = [
-          "https://repo1.maven.org/maven2/org/typelevel/macro-compat_2.12/1.1.1/macro-compat_2.12-1.1.1.jar"
+          "https://repo1.maven.org/maven2/org/scala-lang/modules/scala-java8-compat_2.12/0.8.0/scala-java8-compat_2.12-0.8.0.jar"
       ],
-      jar_sha256 = "8b1514ec99ac9c7eded284367b6c9f8f17a097198a44e6f24488706d66bbd2b8",
-      neverlink=1
-  )
-
-  java_import_external(
-      name = "com___typesafe___akka_and_akka_ds_actor__2___12",
-      licenses = ["notice"],
-      jar_urls = [
-          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.12/2.5.12/akka-actor_2.12-2.5.12.jar"
-      ],
-      jar_sha256 = "5f766c5cefe013ca21e52fb17e5c0e2a693ca4e5261f575112d169540823f661",
-      neverlink=0
-  )
-  java_import_external(
-      name = "com___typesafe___akka_and_akka_ds_actor__2___12__NEVERLINK",
-      licenses = ["notice"],
-      jar_urls = [
-          "https://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.12/2.5.12/akka-actor_2.12-2.5.12.jar"
-      ],
-      jar_sha256 = "5f766c5cefe013ca21e52fb17e5c0e2a693ca4e5261f575112d169540823f661",
+      jar_sha256 = "d9d5dfd1bc49a8158e6e0a90b2ed08fa602984d815c00af16cec53557e83ef8e",
       neverlink=1
   )
 
