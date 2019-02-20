@@ -9,7 +9,7 @@ scala_import(
         "@org___scalacheck_and_scalacheck__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "org___scalacheck_and_scalacheck__2___12",
@@ -25,7 +25,7 @@ scala_import(
         "@com___chuusai_and_shapeless__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "com___chuusai_and_shapeless__2___12",
@@ -41,7 +41,7 @@ scala_import(
         "@org___scalactic_and_scalactic__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "org___scalactic_and_scalactic__2___12",
@@ -57,7 +57,7 @@ scala_import(
         "@org___typelevel_and_macro_ds_compat__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "org___typelevel_and_macro_ds_compat__2___12",
@@ -73,7 +73,7 @@ scala_import(
         "@org___scalatest_and_scalatest__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "org___scalatest_and_scalatest__2___12",
@@ -89,7 +89,7 @@ scala_import(
         "@com___typesafe___akka_and_akka_ds_actor__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "com___typesafe___akka_and_akka_ds_actor__2___12",
@@ -105,7 +105,7 @@ scala_import(
         "@org___scala_ds_lang___modules_and_scala_ds_xml__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "org___scala_ds_lang___modules_and_scala_ds_xml__2___12",
@@ -121,7 +121,7 @@ scala_import(
         "@com___typesafe___akka_and_akka_ds_testkit__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "com___typesafe___akka_and_akka_ds_testkit__2___12",
@@ -137,7 +137,7 @@ scala_import(
         "@org___scala_ds_lang___modules_and_scala_ds_java8_ds_compat__2___12__EXTERNAL__NEVERLINK",
     ],
     visibility = ['//visibility:public'],
-    neverlink = 0
+    neverlink = 1
 )
 scala_import(
     name = "org___scala_ds_lang___modules_and_scala_ds_java8_ds_compat__2___12",
