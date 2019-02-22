@@ -57,7 +57,7 @@ class OtherInstancesSpec extends FlatSpec {
     for {
       s <- arbitrary[String]
       i <- Gen.choose[Int](0, 65535)
-    } yield InetSocketAddress.createUnresolved(s, i)
+    } yield new InetSocketAddress(s, i)
   )
 
   behavior of "Other instances"

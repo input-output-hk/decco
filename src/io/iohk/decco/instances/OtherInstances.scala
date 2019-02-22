@@ -33,7 +33,7 @@ trait OtherInstances {
 
   implicit def InetSocketAddressInstance(implicit pf: PartialCodec[(String, Int)]): PartialCodec[InetSocketAddress] =
     pf.map(
-      si => InetSocketAddress.createUnresolved(si._1, si._2),
+      { case (host: String, port: Int) => new InetSocketAddress(host, port) },
       inetSocketAddress => (inetSocketAddress.getHostName, inetSocketAddress.getPort)
     )
 }

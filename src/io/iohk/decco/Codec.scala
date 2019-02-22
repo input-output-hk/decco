@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
-abstract class Codec[T](private val partialCodec: PartialCodec[T]) extends Ordered[Codec[T]] {
+abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec[T]] {
 
   import Codec._
   import DecodeFailure._
