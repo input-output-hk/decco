@@ -2,14 +2,12 @@ package io.iohk.decco
 
 import java.nio.ByteBuffer
 
-import scala.reflect.runtime.universe.TypeTag
-
 trait PartialCodec[T] { self =>
 
   import PartialCodec._
 
   def size(t: T): Int
-  def typeCode: String
+  def typeCode: TypeCode[T]
   def encode(t: T, start: Int, destination: ByteBuffer): Unit
   def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[T]]
 
@@ -42,14 +40,12 @@ trait PartialCodec[T] { self =>
       that.encode(u, start + tSize, destination)
     }
 
-    override val typeCode: String = s"${this.typeCode} zip ${that.typeCode}"
+    override val typeCode: TypeCode[(T, U)] = TypeCode.tuple2TypeCode(self.typeCode, that.typeCode)
 
     override def toString = s"PartialCodec($typeCode)"
   }
 
-  final def map[U: TypeTag](t2u: T => U, u2t: U => T): PartialCodec[U] = mapExplicit(typeTagCode[U], t2u, u2t)
-
-  final def mapExplicit[U](uTypeCode: String, t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
+  final def map[U](uTypeCode: TypeCode[U], t2u: T => U, u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
     def size(u: U): Int = self.size(u2t(u))
     def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[U]] =
       self.decode(start, source) match {
@@ -62,7 +58,7 @@ trait PartialCodec[T] { self =>
     def encode(u: U, start: Int, destination: ByteBuffer): Unit =
       self.encode(u2t(u), start, destination)
 
-    override val typeCode: String = uTypeCode
+    override val typeCode: TypeCode[U] = uTypeCode
   }
 
 }

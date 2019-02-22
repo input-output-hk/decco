@@ -4,6 +4,8 @@ import java.nio.ByteBuffer
 import java.util.UUID
 
 import io.iohk.decco.Codec.heapCodec
+import io.iohk.decco.DecodeFailure.BodyWrongType
+import io.iohk.decco.TypeCode.genTypeCode
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 import io.iohk.decco.auto._
@@ -20,6 +22,7 @@ class CodecSpec extends FlatSpec {
   behavior of "Codecs"
 
   case class A(s: String, i: Int, l: List[String], u: UUID, f: Float)
+  case class B(s: String, i: Int, l: List[String], u: UUID, f: Float)
   case class Wrap[T](t: T)
 
   implicit val arbitraryA: Arbitrary[A] = Arbitrary(
@@ -57,8 +60,8 @@ class CodecSpec extends FlatSpec {
       val expectedPf = mock[PartialCodec[Wrap[A]]]
       val unexpectedPf = mock[PartialCodec[String]]
       val availableCodecs = Map[String, (Int, ByteBuffer) => Unit](
-        PartialCodec[String].typeCode -> messageWrapper(unexpectedPf),
-        PartialCodec[Wrap[A]].typeCode -> messageWrapper(expectedPf)
+        PartialCodec[String].typeCode.id -> messageWrapper(unexpectedPf),
+        PartialCodec[Wrap[A]].typeCode.id -> messageWrapper(expectedPf)
       )
 
       Codec.decodeFrame(availableCodecs, 0, buffer)
@@ -70,7 +73,8 @@ class CodecSpec extends FlatSpec {
 
   they should "not allow TypeTag implicits to propagate everywhere" in {
 
-    def functionInTheNetwork[T: PartialCodec](t: T): T = {
+    def functionInTheNetwork[T](t: T)(implicit ev: PartialCodec[T]): T = {
+      implicit val wtt: TypeCode[Wrap[T]] = genTypeCode[Wrap, T]
       val framePf: PartialCodec[Wrap[T]] = PartialCodec[Wrap[T]]
       val frameCodec = heapCodec(framePf)
 
@@ -92,6 +96,19 @@ class CodecSpec extends FlatSpec {
     val backingArray: Array[Byte] = bytes.array()
 
     codec.decode(ByteBuffer.wrap(backingArray)) shouldBe Right("string")
+  }
+
+  they should "have distinct type codes for structurally equivalent types" in {
+    val aCodec = heapCodec[A]
+    val bCodec = heapCodec[B]
+    val a = A("a", 1, List("a"), UUID.randomUUID(), 3.14f)
+
+    val aBuffer = aCodec.encode(a)
+
+    bCodec.decode(aBuffer).left.value shouldBe BodyWrongType(
+      expectedType = "CodecSpec.this.B",
+      encounteredType = "CodecSpec.this.A"
+    )
   }
 
   private def codecTest[T](codec: Codec[T])(implicit ev: Arbitrary[T]): Unit = {

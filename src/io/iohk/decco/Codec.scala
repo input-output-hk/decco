@@ -13,7 +13,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
 
   def encode(t: T): ByteBuffer = {
     val bodySize = partialCodec.size(t)
-    val header = (bodySize, partialCodec.typeCode)
+    val header = (bodySize, partialCodec.typeCode.id)
     val headerSize = headerCodec.size(header)
     val r = ByteBuffer.allocate(bodySize + headerSize)
     headerCodec.encode(header, 0, r)
@@ -38,7 +38,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
   }
 
   override def compare(that: Codec[T]): Int =
-    this.partialCodec.typeCode.compare(that.partialCodec.typeCode)
+    this.partialCodec.typeCode.id.compare(that.partialCodec.typeCode.id)
 
   private def decodeBody(
       source: ByteBuffer,
@@ -46,7 +46,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
       typeField: String,
       nextIndex: Int
   ): Either[DecodeFailure, T] = {
-    if (typeField == partialCodec.typeCode) {
+    if (typeField == partialCodec.typeCode.id) {
       if (sizeField <= source.remaining - nextIndex) {
         partialCodec.decode(nextIndex, source) match {
           case Right(DecodeResult(t, _)) =>
@@ -58,7 +58,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
         Left(BodyTooShort(source.remaining - nextIndex, sizeField))
       }
     } else {
-      Left(BodyWrongType(partialCodec.typeCode, typeField))
+      Left(BodyWrongType(partialCodec.typeCode.id, typeField))
     }
   }
 }
