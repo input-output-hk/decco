@@ -10,4 +10,6 @@ object DecodeFailure {
   case class BodyWrongType(expectedType: String, encounteredType: String) extends DecodeFailure
 
   case object BodyWrongFormat extends DecodeFailure
+
+//  case object NoMatchingObjectInBuffer
 }
