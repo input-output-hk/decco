@@ -25,6 +25,10 @@ class CodecSpec extends FlatSpec {
   case class B(s: String, i: Int, l: List[String], u: UUID, f: Float)
   case class Wrap[T](t: T)
 
+  sealed trait X[T, U]
+  case class Y[T, U](t: T, u: U) extends X[T, U]
+  case class Z[T, U]() extends X[T, U]
+
   implicit val arbitraryA: Arbitrary[A] = Arbitrary(
     for {
       s <- arbitrary[String]
@@ -71,7 +75,7 @@ class CodecSpec extends FlatSpec {
     }
   }
 
-  they should "not allow TypeTag implicits to propagate everywhere" in {
+  they should "not allow TypeTag implicits to propagate everywhere for case classes" in {
 
     def functionInTheNetwork[T](t: T)(implicit ev: PartialCodec[T]): T = {
       implicit val wtt: TypeCode[Wrap[T]] = genTypeCode[Wrap, T]
@@ -87,6 +91,35 @@ class CodecSpec extends FlatSpec {
 
     val a = A("string", 1, List(), UUID.randomUUID(), 1.1f)
     functionInTheNetwork(a) shouldBe a
+  }
+
+  they should "not allow TypeTag implicits to propagate everywhere for sealed traits" in {
+
+    def functionInTheNetwork[T, U](
+        t: T,
+        u: U
+    )(implicit tc: PartialCodec[T], uc: PartialCodec[U]): (X[T, U], X[T, U]) = {
+      implicit val xtt: TypeCode[X[T, U]] = genTypeCode[X, T, U]
+      implicit val ytt: TypeCode[Y[T, U]] = genTypeCode[Y, T, U]
+      implicit val ztt: TypeCode[Z[T, U]] = genTypeCode[Z, T, U]
+
+      val framePf: PartialCodec[X[T, U]] = PartialCodec[X[T, U]]
+
+      val frameCodec = heapCodec(framePf)
+
+      val yArr = frameCodec.encode(Y(t, u))
+      val zArr = frameCodec.encode(Z())
+
+      val maybeYFrame: Either[DecodeFailure, X[T, U]] = frameCodec.decode(yArr)
+      val maybeZFrame: Either[DecodeFailure, X[T, U]] = frameCodec.decode(zArr)
+
+      (maybeYFrame.right.value, maybeZFrame.right.value)
+    }
+
+    val a = "a"
+    val b = 'b'
+
+    functionInTheNetwork(a, b) shouldBe (Y(a, b), Z())
   }
 
   they should "support the recovery of backing arrays with heap codec" in {

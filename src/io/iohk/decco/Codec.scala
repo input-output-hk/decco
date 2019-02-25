@@ -73,7 +73,7 @@ object Codec {
    * and so their impact upon the memory footprint of an application might not be obvious.
    * It is therefore recommended that direct buffers be allocated primarily for large, long-lived buffers
    * that are subject to the underlying system's native I/O operations.
-   * In general it is best to allocate direct buffers only when they yield a measureable gain in program performance.
+   * In general it is best to allocate direct buffers only when they yield a measurable gain in program performance.
    */
   def heapCodec[T](implicit ev: PartialCodec[T]): Codec[T] = new Codec[T](ev) {
     override def newBuffer(capacity: Int): ByteBuffer = ByteBuffer.allocate(capacity)
