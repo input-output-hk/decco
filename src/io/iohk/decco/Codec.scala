@@ -98,4 +98,20 @@ object Codec {
         ()
     }
   }
+
+  def decodeFrame2(
+      decoders: Map[String, PartialCodec[Any]],
+      start: Int,
+      source: ByteBuffer
+  ): Either[Failure, (String, DecodeResult[Any])] = {
+    headerCodec.decode(start, source) match {
+      case Right(DecodeResult((_, typeField), nextIndex)) =>
+        val option: Option[PartialCodec[Any]] = decoders.get(typeField)
+        val option2: Option[Either[Failure, (String, DecodeResult[Any])]] =
+          option.map(decoder => decoder.decode(nextIndex, source).map(result => (typeField, result)))
+        option2.getOrElse(Left(Failure))
+      case _ =>
+        Left(Failure)
+    }
+  }
 }
