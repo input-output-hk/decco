@@ -1,7 +1,5 @@
 package io.iohk.decco
 
-import shapeless.{:+:, ::, Coproduct, HList}
-
 import scala.language.higherKinds
 import scala.reflect.runtime.universe._
 
@@ -9,33 +7,24 @@ case class TypeCode[T](id: String) {
   override def toString: String = id
 }
 
-object TypeCode {
+object TypeCode extends SecondaryTypeCodes {
 
-  def apply[T](implicit t: TypeTag[T]): TypeCode[T] = {
+  implicit def apply[T](implicit t: TypeTag[T]): TypeCode[T] = {
     TypeCode(t.tpe.toString)
   }
 
-  def genTypeCode[C[_], V](implicit wtt: WeakTypeTag[C[_]], pcv: PartialCodec[V]): TypeCode[C[V]] = {
-    TypeCode[C[V]](wtt.tpe.toString.replace("[_]", s"[${pcv.typeCode.id}]"))
+}
+
+trait SecondaryTypeCodes {
+  implicit def genTypeCode[C[_], V](implicit wtt: WeakTypeTag[C[_]], cv: Codec[V]): TypeCode[C[V]] = {
+    TypeCode[C[V]](wtt.tpe.toString.replace("[_]", s"[${cv.typeCode.id}]"))
   }
 
-  def genTypeCode[C[_, _], K, V](
+  implicit def genTypeCode[C[_, _], K, V](
       implicit wtt: WeakTypeTag[C[_, _]],
-      pck: PartialCodec[K],
-      pcv: PartialCodec[V]
+      ck: Codec[K],
+      cv: Codec[V]
   ): TypeCode[C[K, V]] = {
-    TypeCode(wtt.tpe.toString.replace("[_, _]", s"[${pck.typeCode.id},${pcv.typeCode.id}]"))
-  }
-
-  def tuple2TypeCode[U, V](u: TypeCode[U], v: TypeCode[V]): TypeCode[(U, V)] = {
-    TypeCode(s"(${u.id}, ${v.id})")
-  }
-
-  def hConsTypeCode[H, T <: HList](h: TypeCode[H], t: TypeCode[T]): TypeCode[H :: T] = {
-    TypeCode(s"${h.id} :: ${t.id}")
-  }
-
-  def cConsTypeCode[H, T <: Coproduct](h: TypeCode[H], t: TypeCode[T]): TypeCode[H :+: T] = {
-    TypeCode(s"${h.id} :+: ${t.id}")
+    TypeCode(wtt.tpe.toString.replace("[_, _]", s"[${ck.typeCode.id},${cv.typeCode.id}]"))
   }
 }

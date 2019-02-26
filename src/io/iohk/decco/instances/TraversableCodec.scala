@@ -2,7 +2,7 @@ package io.iohk.decco.instances
 
 import java.nio.ByteBuffer
 
-import io.iohk.decco.{PartialCodec, TypeCode}
+import io.iohk.decco.PartialCodec
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
 import scala.collection.generic.{CanBuildFrom, IsTraversableLike}
@@ -14,7 +14,7 @@ object TraversableCodec {
 
 import io.iohk.decco.instances.TraversableCodec._
 
-class TraversableCodec[T, CT](val typeCode: TypeCode[CT])(
+class TraversableCodec[T, CT](
     implicit
     iCodec: PartialCodec[Int],
     tCodec: PartialCodec[T],
