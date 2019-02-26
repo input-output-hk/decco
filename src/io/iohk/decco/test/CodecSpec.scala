@@ -25,6 +25,10 @@ class CodecSpec extends FlatSpec {
   case class B(s: String, i: Int, l: List[String], u: UUID, f: Float)
   case class Wrap[T](t: T)
 
+  sealed trait Base[T]
+  case class S1[T](t: T) extends Base[T]
+  case class S2[T]() extends Base[T]
+
   implicit val arbitraryA: Arbitrary[A] = Arbitrary(
     for {
       s <- arbitrary[String]
@@ -60,8 +64,8 @@ class CodecSpec extends FlatSpec {
       val expectedPf = mock[PartialCodec[Wrap[A]]]
       val unexpectedPf = mock[PartialCodec[String]]
       val availableCodecs = Map[String, (Int, ByteBuffer) => Unit](
-        PartialCodec[String].typeCode.id -> messageWrapper(unexpectedPf),
-        PartialCodec[Wrap[A]].typeCode.id -> messageWrapper(expectedPf)
+        Codec[String].typeCode.id -> messageWrapper(unexpectedPf),
+        Codec[Wrap[A]].typeCode.id -> messageWrapper(expectedPf)
       )
 
       Codec.decodeFrame(availableCodecs, 0, buffer)
@@ -71,12 +75,13 @@ class CodecSpec extends FlatSpec {
     }
   }
 
-  they should "not allow TypeTag implicits to propagate everywhere" in {
+  they should "not allow TypeTag implicits to propagate everywhere -- case classes" in {
 
-    def functionInTheNetwork[T](t: T)(implicit ev: PartialCodec[T]): T = {
+    def functionInTheNetwork[T](t: T)(implicit ev: Codec[T]): T = {
       implicit val wtt: TypeCode[Wrap[T]] = genTypeCode[Wrap, T]
+      implicit val tpc: PartialCodec[T] = ev.partialCodec
       val framePf: PartialCodec[Wrap[T]] = PartialCodec[Wrap[T]]
-      val frameCodec = heapCodec(framePf)
+      val frameCodec = heapCodec(framePf, wtt)
 
       val arr = frameCodec.encode(Wrap(t))
 
@@ -87,6 +92,25 @@ class CodecSpec extends FlatSpec {
 
     val a = A("string", 1, List(), UUID.randomUUID(), 1.1f)
     functionInTheNetwork(a) shouldBe a
+  }
+
+  they should "not allow TypeTag implicits to propagate everywhere -- sealed traits" in {
+
+    def functionInTheNetwork[T](t: T)(implicit ev: Codec[T]): Base[T] = {
+      implicit val wtt: TypeCode[Base[T]] = genTypeCode[Base, T]
+      implicit val tpc: PartialCodec[T] = ev.partialCodec
+      val framePf: PartialCodec[Base[T]] = PartialCodec[Base[T]]
+      val frameCodec = heapCodec(framePf, wtt)
+
+      val arr = frameCodec.encode(S1(t))
+
+      val maybeRestoredFrame = frameCodec.decode(arr)
+
+      maybeRestoredFrame.right.value
+    }
+
+    val a = A("string", 1, List(), UUID.randomUUID(), 1.1f)
+    functionInTheNetwork(a) shouldBe S1(a)
   }
 
   they should "support the recovery of backing arrays with heap codec" in {

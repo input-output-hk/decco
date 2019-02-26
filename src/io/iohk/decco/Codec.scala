@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
-abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec[T]] {
+abstract class Codec[T](val partialCodec: PartialCodec[T], val typeCode: TypeCode[T]) extends Ordered[Codec[T]] {
 
   import Codec._
   import DecodeFailure._
@@ -13,7 +13,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
 
   def encode(t: T): ByteBuffer = {
     val bodySize = partialCodec.size(t)
-    val header = (bodySize, partialCodec.typeCode.id)
+    val header = (bodySize, typeCode.id)
     val headerSize = headerCodec.size(header)
     val r = ByteBuffer.allocate(bodySize + headerSize)
     headerCodec.encode(header, 0, r)
@@ -30,15 +30,15 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
     }
   }
 
-  override def hashCode(): Int = this.partialCodec.typeCode.hashCode
+  override def hashCode(): Int = this.typeCode.hashCode
 
   override def equals(obj: Any): Boolean = obj match {
-    case that: Codec[T] => this.partialCodec.typeCode == that.partialCodec.typeCode
+    case that: Codec[T] => this.typeCode == that.typeCode
     case _ => false
   }
 
   override def compare(that: Codec[T]): Int =
-    this.partialCodec.typeCode.id.compare(that.partialCodec.typeCode.id)
+    this.typeCode.id.compare(that.typeCode.id)
 
   private def decodeBody(
       source: ByteBuffer,
@@ -46,7 +46,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
       typeField: String,
       nextIndex: Int
   ): Either[DecodeFailure, T] = {
-    if (typeField == partialCodec.typeCode.id) {
+    if (typeField == typeCode.id) {
       if (sizeField <= source.remaining - nextIndex) {
         partialCodec.decode(nextIndex, source) match {
           case Right(DecodeResult(t, _)) =>
@@ -58,7 +58,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T]) extends Ordered[Codec
         Left(BodyTooShort(source.remaining - nextIndex, sizeField))
       }
     } else {
-      Left(BodyWrongType(partialCodec.typeCode.id, typeField))
+      Left(BodyWrongType(typeCode.id, typeField))
     }
   }
 }
@@ -75,13 +75,15 @@ object Codec {
    * that are subject to the underlying system's native I/O operations.
    * In general it is best to allocate direct buffers only when they yield a measureable gain in program performance.
    */
-  def heapCodec[T](implicit ev: PartialCodec[T]): Codec[T] = new Codec[T](ev) {
+  def heapCodec[T](implicit pc: PartialCodec[T], typeCode: TypeCode[T]): Codec[T] = new Codec[T](pc, typeCode) {
     override def newBuffer(capacity: Int): ByteBuffer = ByteBuffer.allocate(capacity)
   }
 
-  def directCodec[T](implicit ev: PartialCodec[T]): Codec[T] = new Codec[T](ev) {
+  def directCodec[T](implicit pc: PartialCodec[T], typeCode: TypeCode[T]): Codec[T] = new Codec[T](pc, typeCode) {
     override def newBuffer(capacity: Int): ByteBuffer = ByteBuffer.allocateDirect(capacity)
   }
+
+  implicit def apply[T](implicit pc: PartialCodec[T], typeCode: TypeCode[T]): Codec[T] = heapCodec[T](pc, typeCode)
 
   import io.iohk.decco.auto._
 

@@ -2,12 +2,11 @@ package io.iohk.decco
 
 import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
-import shapeless.{:+:, ::, CNil, HNil}
 
 import scala.collection.{LinearSeq, SortedMap, SortedSet}
 import scala.collection.immutable.{HashMap, HashSet, ListMap, ListSet, NumericRange, Queue, TreeMap, TreeSet}
 import auto._
-import io.iohk.decco.TypeCode.{genTypeCode, tuple2TypeCode}
+import io.iohk.decco.TypeCode.genTypeCode
 
 class TypeCodeSpec extends FlatSpec {
 
@@ -45,23 +44,11 @@ class TypeCodeSpec extends FlatSpec {
     genTypeCode[Array, A] shouldBe TypeCode[Array[A]]
   }
 
-  it should "infer type codes for tuples" in {
-    tuple2TypeCode[A, B](TypeCode[A], TypeCode[B]) shouldBe TypeCode[(A, B)]
-  }
-
   it should "infer type codes for single wrapper types" in {
     genTypeCode[Wrap1, A] shouldBe TypeCode[Wrap1[A]]
   }
 
   it should "infer type codes for dual wrapper types" in {
     genTypeCode[Wrap2, A, B] shouldBe TypeCode[Wrap2[A, B]]
-  }
-
-  it should "infer type codes for HLists" in {
-    TypeCode.hConsTypeCode(TypeCode[A], TypeCode[HNil]) shouldBe TypeCode[A :: HNil]
-  }
-
-  it should "infer type codes for Coproducts" in {
-    TypeCode.cConsTypeCode(TypeCode[A], TypeCode[CNil]) shouldBe TypeCode[A :+: CNil]
   }
 }
