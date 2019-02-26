@@ -123,7 +123,7 @@ trait CollectionInstances {
     )
   }
 
-  implicit def StringPartialCodec(implicit pf: PartialCodec[Array[Char]]): PartialCodec[String] =
+  implicit def StringInstance(implicit pf: PartialCodec[Array[Char]]): PartialCodec[String] =
     pf.map[String](String.valueOf, _.toCharArray)
 
   //

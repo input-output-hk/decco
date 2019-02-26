@@ -22,11 +22,15 @@ class CodecSpec extends FlatSpec {
   behavior of "Codecs"
 
   case class A(s: String, i: Int, l: List[String], u: UUID, f: Float)
+
   case class B(s: String, i: Int, l: List[String], u: UUID, f: Float)
+
   case class Wrap[T](t: T)
 
   sealed trait Base[T]
+
   case class S1[T](t: T) extends Base[T]
+
   case class S2[T]() extends Base[T]
 
   implicit val arbitraryA: Arbitrary[A] = Arbitrary(

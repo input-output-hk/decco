@@ -67,6 +67,7 @@ class TraversableCodec[T, CT](
       implicit tCodec: PartialCodec[T]
   ): Either[Failure, DecodeResult[CT]] = {
 
+    // FIXME this might stack overflow for big arrays.
     def nextDecode(
         iDest: Int,
         accE: Either[Failure, DecodeResult[mutable.Builder[T, CT]]]
