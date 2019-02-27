@@ -37,7 +37,10 @@ object MD5 {
       if (source.remaining() < 16) {
         Left(Failure)
       } else {
-        source.get(dst, start, 16)
+        dst.foldLeft(0) { (acc, _) =>
+          dst(acc) = source.get(start + acc)
+          acc + 1
+        }
         Right(DecodeResult(new MD5(dst), start + 16))
       }
     }

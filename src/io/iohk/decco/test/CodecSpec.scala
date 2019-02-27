@@ -12,7 +12,7 @@ import io.iohk.decco.auto._
 import org.scalatest.mockito.MockitoSugar._
 import org.scalatest.EitherValues._
 import org.mockito.Mockito.{never, verify}
-import org.mockito.ArgumentMatchers.{any, anyInt, eq => meq}
+import org.mockito.ArgumentMatchers.{any, eq => meq}
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks._
@@ -65,17 +65,18 @@ class CodecSpec extends FlatSpec {
     forAll { message: Wrap[A] =>
       val messageCodec = heapCodec[Wrap[A]]
       val buffer: ByteBuffer = messageCodec.encode(message)
-      val expectedPf = mock[PartialCodec[Wrap[A]]]
-      val unexpectedPf = mock[PartialCodec[String]]
+
+      val expectedPc = mock[PartialCodec[Wrap[A]]]
+      val unexpectedPc = mock[PartialCodec[String]]
       val availableCodecs = Map[String, (Int, ByteBuffer) => Unit](
-        Codec[String].typeCode.id -> messageWrapper(unexpectedPf),
-        Codec[Wrap[A]].typeCode.id -> messageWrapper(expectedPf)
+        Codec[String].typeCode.id -> messageWrapper(unexpectedPc),
+        Codec[Wrap[A]].typeCode.id -> messageWrapper(expectedPc)
       )
 
       Codec.decodeFrame(availableCodecs, 0, buffer)
 
-      verify(expectedPf).decode(anyInt(), meq(buffer))
-      verify(unexpectedPf, never()).decode(any(), any())
+      verify(expectedPc).decode(meq(20), meq(buffer))
+      verify(unexpectedPc, never()).decode(any(), any())
     }
   }
 
