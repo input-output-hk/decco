@@ -134,8 +134,8 @@ class CodecSpec extends FlatSpec {
     val aBuffer = aCodec.encode(a)
 
     bCodec.decode(aBuffer).left.value shouldBe BodyWrongType(
-      expectedType = "CodecSpec.this.B",
-      encounteredType = "CodecSpec.this.A"
+      expectedType = MD5("CodecSpec.this.B"),
+      encounteredType = MD5("CodecSpec.this.A")
     )
   }
 

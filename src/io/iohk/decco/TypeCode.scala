@@ -12,7 +12,6 @@ object TypeCode extends SecondaryTypeCodes {
   implicit def apply[T](implicit t: TypeTag[T]): TypeCode[T] = {
     TypeCode(t.tpe.toString)
   }
-
 }
 
 trait SecondaryTypeCodes {

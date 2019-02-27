@@ -13,7 +13,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T], val typeCode: TypeCod
 
   def encode(t: T): ByteBuffer = {
     val bodySize = partialCodec.size(t)
-    val header = (bodySize, typeCode.id)
+    val header = (bodySize, MD5(typeCode.id))
     val headerSize = headerCodec.size(header)
     val r = ByteBuffer.allocate(bodySize + headerSize)
     headerCodec.encode(header, 0, r)
@@ -43,10 +43,10 @@ abstract class Codec[T](val partialCodec: PartialCodec[T], val typeCode: TypeCod
   private def decodeBody(
       source: ByteBuffer,
       sizeField: Int,
-      typeField: String,
+      typeField: MD5,
       nextIndex: Int
   ): Either[DecodeFailure, T] = {
-    if (typeField == typeCode.id) {
+    if (typeField == MD5(typeCode.id)) {
       if (sizeField <= source.remaining - nextIndex) {
         partialCodec.decode(nextIndex, source) match {
           case Right(DecodeResult(t, _)) =>
@@ -58,7 +58,7 @@ abstract class Codec[T](val partialCodec: PartialCodec[T], val typeCode: TypeCod
         Left(BodyTooShort(source.remaining - nextIndex, sizeField))
       }
     } else {
-      Left(BodyWrongType(typeCode.id, typeField))
+      Left(BodyWrongType(MD5(typeCode.id), typeField))
     }
   }
 }
@@ -87,33 +87,35 @@ object Codec {
 
   import io.iohk.decco.auto._
 
-  private[decco] val headerCodec = PartialCodec[(Int, String)]
+  private[decco] val headerCodec = PartialCodec[(Int, MD5)]
 
   // 'Rehydrating' function.
   // From a buffer of unknown type, read the typeCode and apply the
   // data to a function that maps to a decoder with the corresponding typeCode.
   def decodeFrame(decoderWrappers: Map[String, (Int, ByteBuffer) => Unit], start: Int, source: ByteBuffer): Unit = {
+    val hashWrappers: Map[MD5, (Int, ByteBuffer) => Unit] = decoderWrappers.map { case (typeCode, decoderWrapper) => (MD5(typeCode), decoderWrapper)}
+
     headerCodec.decode(start, source) match {
       case Right(DecodeResult((_, typeField), nextIndex)) =>
-        decoderWrappers.get(typeField).foreach(decoderWrapper => decoderWrapper(nextIndex, source))
+        hashWrappers.get(typeField).foreach(decoderWrapper => decoderWrapper(nextIndex, source))
       case _ =>
         ()
     }
   }
 
-  def decodeFrame2(
-      decoders: Map[String, PartialCodec[Any]],
-      start: Int,
-      source: ByteBuffer
-  ): Either[Failure, (String, DecodeResult[Any])] = {
-    headerCodec.decode(start, source) match {
-      case Right(DecodeResult((_, typeField), nextIndex)) =>
-        val option: Option[PartialCodec[Any]] = decoders.get(typeField)
-        val option2: Option[Either[Failure, (String, DecodeResult[Any])]] =
-          option.map(decoder => decoder.decode(nextIndex, source).map(result => (typeField, result)))
-        option2.getOrElse(Left(Failure))
-      case _ =>
-        Left(Failure)
-    }
-  }
+//  def decodeFrame2(
+//      decoders: Map[String, PartialCodec[Any]],
+//      start: Int,
+//      source: ByteBuffer
+//  ): Either[Failure, (String, DecodeResult[Any])] = {
+//    headerCodec.decode(start, source) match {
+//      case Right(DecodeResult((_, typeField), nextIndex)) =>
+//        val option: Option[PartialCodec[Any]] = decoders.get(typeField)
+//        val option2: Option[Either[Failure, (String, DecodeResult[Any])]] =
+//          option.map(decoder => decoder.decode(nextIndex, source).map(result => (typeField, result)))
+//        option2.getOrElse(Left(Failure))
+//      case _ =>
+//        Left(Failure)
+//    }
+//  }
 }
