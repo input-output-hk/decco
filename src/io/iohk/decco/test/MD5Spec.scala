@@ -12,6 +12,6 @@ class MD5Spec extends FlatSpec {
   }
 
   it should "not equal objects of other types" in {
-    MD5("hello") shouldNot be (MD5("hello").hash)
+    MD5("hello") shouldNot be(MD5("hello").hash)
   }
 }

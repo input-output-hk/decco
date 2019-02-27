@@ -87,13 +87,15 @@ object Codec {
 
   import io.iohk.decco.auto._
 
-  private[decco] val headerCodec = PartialCodec[(Int, MD5)]
+  private[decco] val headerCodec: PartialCodec[(Int, MD5)] = IntPartialCodec.zip(MD5.md5Codec)
 
   // 'Rehydrating' function.
   // From a buffer of unknown type, read the typeCode and apply the
   // data to a function that maps to a decoder with the corresponding typeCode.
   def decodeFrame(decoderWrappers: Map[String, (Int, ByteBuffer) => Unit], start: Int, source: ByteBuffer): Unit = {
-    val hashWrappers: Map[MD5, (Int, ByteBuffer) => Unit] = decoderWrappers.map { case (typeCode, decoderWrapper) => (MD5(typeCode), decoderWrapper)}
+    val hashWrappers: Map[MD5, (Int, ByteBuffer) => Unit] = decoderWrappers.map {
+      case (typeCode, decoderWrapper) => (MD5(typeCode), decoderWrapper)
+    }
 
     headerCodec.decode(start, source) match {
       case Right(DecodeResult((_, typeField), nextIndex)) =>
@@ -102,20 +104,4 @@ object Codec {
         ()
     }
   }
-
-//  def decodeFrame2(
-//      decoders: Map[String, PartialCodec[Any]],
-//      start: Int,
-//      source: ByteBuffer
-//  ): Either[Failure, (String, DecodeResult[Any])] = {
-//    headerCodec.decode(start, source) match {
-//      case Right(DecodeResult((_, typeField), nextIndex)) =>
-//        val option: Option[PartialCodec[Any]] = decoders.get(typeField)
-//        val option2: Option[Either[Failure, (String, DecodeResult[Any])]] =
-//          option.map(decoder => decoder.decode(nextIndex, source).map(result => (typeField, result)))
-//        option2.getOrElse(Left(Failure))
-//      case _ =>
-//        Left(Failure)
-//    }
-//  }
 }

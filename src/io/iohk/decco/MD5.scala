@@ -26,7 +26,7 @@ object MD5 {
     override def size(md5: MD5): Int = 16
 
     override def encode(md5: MD5, start: Int, destination: ByteBuffer): Unit = {
-      md5.hash.foldLeft(0) {(acc, next) =>
+      md5.hash.foldLeft(0) { (acc, next) =>
         destination.put(start + acc, next)
         acc + 1
       }
@@ -36,8 +36,7 @@ object MD5 {
       val dst = new Array[Byte](16)
       if (source.remaining() < 16) {
         Left(Failure)
-      }
-      else {
+      } else {
         source.get(dst, start, 16)
         Right(DecodeResult(new MD5(dst), start + 16))
       }
