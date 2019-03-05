@@ -1,9 +1,6 @@
 package io.iohk.decco.instances
 
-import java.nio.ByteBuffer
-
-import io.iohk.decco.PartialCodec
-import io.iohk.decco.TestingHelpers.partialCodecTest
+import io.iohk.decco.TestingHelpers._
 import io.iohk.decco.auto._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -11,7 +8,6 @@ import org.scalatest.FlatSpec
 
 import scala.collection.immutable.{HashSet, ListSet, NumericRange, Queue, TreeSet}
 import scala.collection.{LinearSeq, SortedMap, SortedSet}
-import scala.util.Random
 
 class CollectionInstancesSpec extends FlatSpec {
 
@@ -83,21 +79,6 @@ class CollectionInstancesSpec extends FlatSpec {
   }
 
   they should "not explode the stack for large collections" in {
-    import org.scalatest.EitherValues._
-    import org.scalatest.Matchers._
-    val codec = PartialCodec[Array[Byte]]
-    val data = randomBytes(10*1024*1024)
-    val buff = ByteBuffer.allocate(10*1024*1024 + 4)
-    codec.encode(data, 0, buff)
-    val result = codec.decode(0, buff).right.value
-    result.decoded shouldBe data
-    result.nextIndex shouldBe buff.capacity
+    largeArrayTest(10 * 1024 * 1024)
   }
-
-  private def randomBytes(n: Int): Array[Byte] = {
-    val a = new Array[Byte](n)
-    Random.nextBytes(a)
-    a
-  }
-
 }

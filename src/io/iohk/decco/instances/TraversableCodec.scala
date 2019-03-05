@@ -73,7 +73,7 @@ class TraversableCodec[T, CT](
         iDest: Int,
         accE: Either[Failure, DecodeResult[mutable.Builder[T, CT]]]
     ): Either[Failure, DecodeResult[mutable.Builder[T, CT]]] = {
-      if (iDest >= count)
+      if (iDest == count)
         accE
       else {
         accE match {
@@ -87,23 +87,9 @@ class TraversableCodec[T, CT](
               case Right(tResult) =>
                 val dest: mutable.Builder[T, CT] = result.decoded
                 dest += tResult.decoded
-                nextDecode(iDest + 1, accE)
+                nextDecode(iDest + 1, Right(DecodeResult(dest, tResult.nextIndex)))
             }
         }
-//        val x: Either[Failure, DecodeResult[mutable.Builder[T, CT]]] = accE.flatMap { acc =>
-//          tCodec.decode(acc.nextIndex, source).flatMap { tResult =>
-//            val dest: mutable.Builder[T, CT] = acc.decoded
-//            dest += tResult.decoded
-//            Right(DecodeResult(dest, tResult.nextIndex))
-//          }
-//        }
-//
-//        x match {
-//          case Left(_) =>
-//            x
-//          case Right(result) =>
-//            nextDecode(iDest + 1, Right(result))
-//        }
       }
     }
 

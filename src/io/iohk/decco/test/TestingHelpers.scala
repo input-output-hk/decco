@@ -9,6 +9,8 @@ import org.scalatest.Matchers._
 import org.scalatest.prop.GeneratorDrivenPropertyChecks._
 import org.scalatest.EitherValues._
 
+import scala.util.Random
+
 object TestingHelpers {
 
   def partialCodecTest[T](implicit codec: PartialCodec[T], a: Arbitrary[T]): Unit = {
@@ -38,5 +40,20 @@ object TestingHelpers {
       codec.encode(t, 0, buff)
       codec.decode(Int.MaxValue, buff) shouldBe Left(Failure)
     }
+  }
+
+  def largeArrayTest(buffSz: Int)(implicit codec: PartialCodec[Array[Byte]]): Unit = {
+    val data = randomBytes(buffSz)
+    val buff = ByteBuffer.allocate(buffSz + 4)
+    codec.encode(data, 0, buff)
+    val result = codec.decode(0, buff).right.value
+    result.decoded shouldBe data
+    result.nextIndex shouldBe buff.capacity
+  }
+
+  private def randomBytes(n: Int): Array[Byte] = {
+    val a = new Array[Byte](n)
+    Random.nextBytes(a)
+    a
   }
 }
