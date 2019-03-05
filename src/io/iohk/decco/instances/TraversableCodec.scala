@@ -67,7 +67,6 @@ class TraversableCodec[T, CT](
       implicit tCodec: PartialCodec[T]
   ): Either[Failure, DecodeResult[CT]] = {
 
-    // FIXME this might stack overflow for big arrays.
     @annotation.tailrec
     def nextDecode(
         iDest: Int,
