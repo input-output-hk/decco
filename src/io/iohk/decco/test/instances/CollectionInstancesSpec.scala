@@ -80,5 +80,6 @@ class CollectionInstancesSpec extends FlatSpec {
 
   they should "not explode the stack for large collections" in {
     largeArrayTest(10 * 1024 * 1024)
+    largeStringTest(10 * 1024 * 1024)
   }
 }

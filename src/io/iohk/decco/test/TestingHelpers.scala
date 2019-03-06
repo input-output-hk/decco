@@ -51,6 +51,15 @@ object TestingHelpers {
     result.nextIndex shouldBe buff.capacity
   }
 
+  def largeStringTest(sz: Int)(implicit codec: PartialCodec[String]): Unit = {
+    val data = Random.alphanumeric.take(sz).mkString("")
+    val buff = ByteBuffer.allocate(sz * 2 + 4)
+    codec.encode(data, 0, buff)
+    val result = codec.decode(0, buff).right.value
+    result.decoded shouldBe data
+    result.nextIndex shouldBe buff.capacity
+  }
+
   private def randomBytes(n: Int): Array[Byte] = {
     val a = new Array[Byte](n)
     Random.nextBytes(a)
