@@ -2,6 +2,7 @@ package io.iohk.decco
 
 import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.nio.Buffer;
 
 import io.iohk.decco.PartialCodec.{DecodeResult, Failure}
 
@@ -34,7 +35,10 @@ object MD5 {
 
     override def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[MD5]] = {
       val dst = new Array[Byte](16)
-      if (source.remaining() < 16) {
+      val p = (source: Buffer).position()
+      val l = (source: Buffer).remaining()
+      (source: Buffer).position(p)
+      if (l < start + 16) {
         Left(Failure)
       } else {
         dst.foldLeft(0) { (acc, _) =>

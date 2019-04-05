@@ -67,25 +67,19 @@ class TraversableCodec[T, CT](
       implicit tCodec: PartialCodec[T]
   ): Either[Failure, DecodeResult[CT]] = {
 
-    // FIXME this might stack overflow for big arrays.
-    def nextDecode(
-        iDest: Int,
-        accE: Either[Failure, DecodeResult[mutable.Builder[T, CT]]]
-    ): Either[Failure, DecodeResult[mutable.Builder[T, CT]]] = {
-      if (iDest == count)
-        accE
-      else
-        accE.flatMap { acc =>
-          tCodec.decode(acc.nextIndex, source).flatMap { tResult =>
-            val dest: mutable.Builder[T, CT] = acc.decoded
-            dest += tResult.decoded
-
-            nextDecode(iDest + 1, Right(DecodeResult(dest, tResult.nextIndex)))
-          }
-        }
+    val dest: mutable.Builder[T, CT] = cbf()
+    dest.sizeHint(count)
+    var i = 0
+    var nextStart = start
+    while (i < count) {
+      tCodec.decode(nextStart, source) match {
+        case Left(error) => return Left(error)
+        case Right(DecodeResult(item, ni)) =>
+          nextStart = ni
+          dest += item
+      }
+      i += 1
     }
-
-    nextDecode(0, Right(DecodeResult(cbf(), start)))
-      .map(result => DecodeResult(result.decoded.result(), result.nextIndex))
+    Right(DecodeResult(dest.result(), nextStart))
   }
 }
