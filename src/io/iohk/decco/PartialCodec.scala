@@ -54,6 +54,25 @@ trait PartialCodec[T] { self =>
       self.encode(u2t(u), start, destination)
   }
 
+  final def mapOpt[U](t2u: T => Option[U], u2t: U => T): PartialCodec[U] = new PartialCodec[U] {
+    def size(u: U): Int = self.size(u2t(u))
+    def decode(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[U]] =
+      self.decode(start, source) match {
+        case Left(Failure) =>
+          Left(Failure)
+        case Right(DecodeResult(t, nextIndex)) =>
+          t2u(t) match {
+            case None =>
+              Left(Failure)
+            case Some(u) =>
+              Right(DecodeResult(u, nextIndex))
+          }
+      }
+
+    def encode(u: U, start: Int, destination: ByteBuffer): Unit =
+      self.encode(u2t(u), start, destination)
+  }
+
 }
 
 object PartialCodec {
