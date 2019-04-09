@@ -5,21 +5,15 @@ import java.nio.ByteBuffer
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalactic.Equivalence
-import org.scalatest.Inside.inside
 import org.scalatest.Matchers.equal
 import org.scalatest.prop.GeneratorDrivenPropertyChecks._
 import scala.util.Random
 import org.scalatest.Matchers._
 import org.scalatest.EitherValues._
-import auto._
+
+import io.iohk.decco.BufferInstantiator.global.HeapByteBuffer
 
 trait CodecTestingHelpers {
-
-  case class UnexpectedThing()
-  object UnexpectedThing {
-    implicit val UnexpectedThingArbitrary: Arbitrary[UnexpectedThing] =
-      Arbitrary(arbitrary[Unit].map(_ => UnexpectedThing()))
-  }
 
   def encodeDecodeTest[T](
       implicit codec: Codec[T],
@@ -32,74 +26,52 @@ trait CodecTestingHelpers {
     }
   }
 
-  def mistypeTest[T, U](
-      implicit codecU: Codec[U],
-      codecT: Codec[T],
-      a: Arbitrary[T]
+  def testCodec[A, B <: A](
+      implicit codecA: Codec[A],
+      codecB: Codec[B],
+      aa: Arbitrary[B],
+      eq: Equivalence[A]
   ): Unit = {
-
-    forAll(arbitrary[T]) { t =>
-      val buff: ByteBuffer = codecT.encode(t)
-      val dec = codecU.decode(buff)
-      dec.isLeft shouldBe true
+    forAll(arbitrary[B]) { t =>
+      codecA.decode(codecA.encode(t)).right.value should equal(t)
+      codecB.decode(codecB.encode(t)).right.value should equal(t)
+      codecB.decode(codecA.encode(t)).right.value should equal(t)
+      codecA.decode(codecB.encode(t)) should equal(Right(t))
     }
   }
 
   def variableLengthTest[T](
       implicit codec: Codec[T],
-      a: Arbitrary[T]
+      a: Arbitrary[T],
+      eq: Equivalence[T]
   ): Unit = {
     forAll(arbitrary[T]) { t =>
       // create a buffer with one half full of real data
       // and the second half full of rubbish.
       // codecs should not be fooled by this.
-      val b: ByteBuffer = codec.encode(t)
+      val b = codec.encode(t).toArray
       val newB = ByteBuffer
-        .allocate(b.capacity() * 2)
+        .allocate(b.length * 2)
         .put(b)
-        .put(randomBytes(b.capacity()))
-      (newB: java.nio.Buffer).flip()
+        .put(randomBytes(b.length))
+      (newB: java.nio.Buffer).position(0)
 
-      inside(codec.decode(newB)) {
-        case Right(tt) => tt shouldBe t
-      }
+      codec.decode(newB).right.value shouldBe t
     }
   }
 
-  def unfulBufferTest[T](implicit codec: Codec[T]): Unit = {
-
-    codec.decode(ByteBuffer.allocate(0)).isLeft shouldBe true
-    codec.decode(ByteBuffer.allocate(5)).isLeft shouldBe true
-
-    val b = ByteBuffer.allocate(5)
-    b.put(-1.toByte)
-    b.put(-12.toByte)
-    b.put(-1.toByte)
-    b.put(-128.toByte)
-    b.put(-118.toByte)
-    codec.decode(b).isLeft shouldBe true
-  }
-
-  def testFull[T: Codec: Arbitrary]: Unit = {
+  def testCodec[T: Codec: Arbitrary]: Unit = {
     encodeDecodeTest[T]
     variableLengthTest[T]
-    unfulBufferTest[T]
-    mistypeTest[T, UnexpectedThing]
-    mistypeTest[UnexpectedThing, T]
-  }
-  def testWhenNotEncodingType[T: Codec: Arbitrary]: Unit = {
-    encodeDecodeTest[T]
-    variableLengthTest[T]
-    unfulBufferTest[T]
   }
 
-  def randomBytes(n: Int): Array[Byte] = {
+  private def randomBytes(n: Int): Array[Byte] = {
     val a = new Array[Byte](n)
     Random.nextBytes(a)
     a
   }
 
-  def concatenate(buffs: Seq[ByteBuffer]): ByteBuffer = {
+  private def concatenate(buffs: Seq[ByteBuffer]): ByteBuffer = {
     val allocSize =
       buffs.foldLeft(0)((acc, nextBuff) => acc + nextBuff.capacity())
 
@@ -109,4 +81,20 @@ trait CodecTestingHelpers {
       .flip()
       .asInstanceOf[ByteBuffer]
   }
+
+  implicit private class ByteBufferConversionOps(val byteBuffer: ByteBuffer) {
+    def toArray: Array[Byte] = {
+      if (byteBuffer.hasArray)
+        byteBuffer.array
+      else {
+        (byteBuffer: java.nio.Buffer).position(0)
+        val arr = new Array[Byte](byteBuffer.remaining())
+        byteBuffer.get(arr)
+        arr
+      }
+    }
+  }
+
 }
+
+object CodecTestingHelpers extends CodecTestingHelpers

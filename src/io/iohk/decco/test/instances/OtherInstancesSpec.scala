@@ -1,11 +1,12 @@
-package io.iohk.decco.instances
+package io.iohk.decco
+package test.instances
 
 import java.net.{InetAddress, InetSocketAddress}
 import java.nio.ByteBuffer
 import java.time._
 import java.util.UUID
 
-import io.iohk.decco.TestingHelpers.partialCodecTest
+import io.iohk.decco.test.utils.CodecTestingHelpers._
 import org.scalatest.FlatSpec
 import io.iohk.decco.auto._
 import org.scalacheck.{Arbitrary, Gen}
@@ -63,13 +64,13 @@ class OtherInstancesSpec extends FlatSpec {
   behavior of "Other instances"
 
   they should "work" in {
-    partialCodecTest[BigDecimal]
-    partialCodecTest[UUID]
-    partialCodecTest[Instant]
-    partialCodecTest[LocalDate]
-    partialCodecTest[LocalTime]
-    partialCodecTest[LocalDateTime]
-    partialCodecTest[InetAddress]
-    partialCodecTest[InetSocketAddress]
+    testCodec[BigDecimal]
+    testCodec[UUID]
+    testCodec[Instant]
+    testCodec[LocalDate]
+    testCodec[LocalTime]
+    testCodec[LocalDateTime]
+    testCodec[InetAddress]
+    testCodec[InetSocketAddress]
   }
 }

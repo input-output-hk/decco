@@ -1,9 +1,11 @@
-package io.iohk.decco.instances
+package io.iohk.decco
+package test.instances
 
-import io.iohk.decco.TestingHelpers.partialCodecTest
+import io.iohk.decco.test.utils.CodecTestingHelpers._
 import io.iohk.decco.auto._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FlatSpec
+import scala.reflect.ClassTag
 
 class ProductInstancesSpec extends FlatSpec {
   behavior of "Product instances"
@@ -11,21 +13,60 @@ class ProductInstancesSpec extends FlatSpec {
   sealed trait TrafficLight
   case class Red() extends TrafficLight
   case class Amber() extends TrafficLight
-  case class Green() extends TrafficLight
+  case object Green extends TrafficLight
+
+  implicit val arbitraryRedLight: Arbitrary[Red] = Arbitrary(Gen.const(Red()))
+  implicit val arbitraryAmberLight: Arbitrary[Amber] = Arbitrary(Gen.const(Amber()))
+  implicit val arbitraryGreenLight: Arbitrary[Green.type] = Arbitrary(Gen.const(Green))
 
   implicit val arbitraryTrafficLight: Arbitrary[TrafficLight] = Arbitrary(
-    Gen.oneOf(Red(), Amber(), Green())
+    Gen.oneOf(Red(), Amber(), Green)
   )
 
   they should "support sealed trait hierarchies" in {
-    partialCodecTest[TrafficLight]
+    testCodec[Red]
+    testCodec[Amber]
+    testCodec[Green.type]
+    testCodec[TrafficLight]
+    testCodec[TrafficLight, Red]
+    testCodec[TrafficLight, Amber]
+    testCodec[TrafficLight, Green.type]
   }
 
-  they should "support option" in {
-    partialCodecTest[Option[String]]
+  def testsFor[A: Arbitrary: Codec: ClassTag]: Unit = {
+    val aName = implicitly[ClassTag[A]].toString
+    they should ("support Option[" + aName + "]") in {
+      testCodec[Option[A]]
+    }
+
+    def combinedWith[B: Arbitrary: Codec: ClassTag]: Unit = {
+      val bName = implicitly[ClassTag[B]].toString
+      they should ("support Either[" + aName + ", " + bName + "]") in {
+        testCodec[Either[A, B]]
+      }
+
+      they should ("support tuples (" + aName + ", " + bName + ")") in {
+        testCodec[(A, B)]
+        testCodec[(A, B, Int)]
+        testCodec[(A, B, Int, Double)]
+        testCodec[(A, B, Int, Double, Boolean)]
+        testCodec[(A, B, Int, Double, Boolean, TrafficLight)]
+      }
+    }
+
+    combinedWith[String]
+    combinedWith[Int]
+    combinedWith[TrafficLight]
+    combinedWith[Red]
+    combinedWith[(Int, String)]
+    combinedWith[Boolean]
+
   }
 
-  they should "support Either" in {
-    partialCodecTest[Either[String, Int]]
-  }
+  testsFor[String]
+  testsFor[Int]
+  testsFor[TrafficLight]
+  testsFor[Red]
+  testsFor[(Int, String)]
+
 }

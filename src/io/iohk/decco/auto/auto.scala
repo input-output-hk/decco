@@ -1,5 +1,10 @@
 package io.iohk.decco
 
-import io.iohk.decco.instances.{CollectionInstances, NativeInstances, OtherInstances, ProductInstances}
+import auto.instances._
 
-package object auto extends NativeInstances with CollectionInstances with ProductInstances with OtherInstances
+package object auto extends HighPriorityInstances
+
+trait HighPriorityInstances extends NativeInstances with OtherInstances with MiddlePriorityInstances
+trait MiddlePriorityInstances extends CollectionInstances with LowPriorityInstances
+
+trait LowPriorityInstances extends ProductInstances

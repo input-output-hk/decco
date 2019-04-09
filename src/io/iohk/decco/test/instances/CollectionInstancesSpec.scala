@@ -1,6 +1,7 @@
-package io.iohk.decco.instances
+package io.iohk.decco
+package test.instances
 
-import io.iohk.decco.TestingHelpers.partialCodecTest
+import io.iohk.decco.test.utils.CodecTestingHelpers._
 import io.iohk.decco.auto._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
@@ -34,47 +35,36 @@ class CollectionInstancesSpec extends FlatSpec {
   )
 
   they should "work for this case" in {
-    partialCodecTest[A]
-    partialCodecTest[Map[A, A]]
+    testCodec[A]
+    testCodec[Map[A, A]]
   }
 
   they should "encode and decode collection types" in {
     // interfaces in the collection hierarchy
-    partialCodecTest[Traversable[String]]
-    partialCodecTest[Iterable[String]]
-    partialCodecTest[Set[String]]
-    partialCodecTest[SortedSet[String]]
-    partialCodecTest[Map[String, String]]
-    partialCodecTest[SortedMap[String, String]]
-    partialCodecTest[Seq[String]]
-    partialCodecTest[IndexedSeq[String]]
-    partialCodecTest[LinearSeq[String]]
+    testCodec[Traversable[String]]
+    testCodec[Iterable[String]]
+    testCodec[Set[String]]
+    testCodec[SortedSet[String]]
+    testCodec[Map[String, String]]
+    testCodec[SortedMap[String, String]]
+    testCodec[Seq[String]]
+    testCodec[IndexedSeq[String]]
+    testCodec[LinearSeq[String]]
 
     // concrete types in the collection hierarchy
-    partialCodecTest[HashSet[String]]
-    partialCodecTest[ListSet[String]]
-    partialCodecTest[TreeSet[String]]
+    testCodec[HashSet[String]]
+    testCodec[ListSet[String]]
+    testCodec[TreeSet[String]]
 
-    partialCodecTest[Vector[String]]
-    partialCodecTest[String]
-    partialCodecTest[List[String]]
-    partialCodecTest[Stream[String]]
-    partialCodecTest[Queue[String]]
+    testCodec[Vector[String]]
+    testCodec[String]
+    testCodec[List[String]]
+    testCodec[Stream[String]]
+    testCodec[Queue[String]]
 
-    partialCodecTest[Range]
-    partialCodecTest[NumericRange[Long]]
+    testCodec[Range]
+    testCodec[NumericRange[Long]]
 
-    partialCodecTest[Array[String]]
-  }
-
-  they should "encode and decode native array types" in {
-    partialCodecTest[Array[Byte]]
-    partialCodecTest[Array[Short]]
-    partialCodecTest[Array[Char]]
-    partialCodecTest[Array[Int]]
-    partialCodecTest[Array[Long]]
-    partialCodecTest[Array[Float]]
-    partialCodecTest[Array[Double]]
-    partialCodecTest[Array[Boolean]]
+    testCodec[Array[String]]
   }
 }

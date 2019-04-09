@@ -2,7 +2,6 @@ load("//scala:rules.bzl", "scala_library", "scala_test")
 
 scala_library(
     name = "decco",
-    external = ["com.chuusai:shapeless%"],
 )
 
 scala_test(
@@ -13,6 +12,7 @@ scala_test(
     ],
     deps = [
         "decco",
-        "//src/io/iohk/codecs/nio/test/utils",
+        "//src/io/iohk/decco/auto",
+        "//src/io/iohk/decco/test/utils",
     ],
 )
