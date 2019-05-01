@@ -20,9 +20,7 @@ with pkgs; {
 
     bazelTarget = "//src/io/iohk/codecs";
 
-    fetchAttrs.sha256 = "1bdyk496f7246iarpmyp0wf1gh9xn5lkyzl1zwwbpbj9bbmpcl1b";
-
-    #buildInputs = [ git ];
+    fetchAttrs.sha256 = "1422qh3m2r2vmshaf3x1hk06ajqdbv3mmw4sdf5w7c2qhpghxf4m";
 
     buildAttrs = {
       postPatch = ''
