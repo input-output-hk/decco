@@ -61,6 +61,8 @@ class OtherInstancesSpec extends FlatSpec {
     } yield new InetSocketAddress(s, i)
   )
 
+
+
   behavior of "Other instances"
 
   they should "work" in {
@@ -72,5 +74,6 @@ class OtherInstancesSpec extends FlatSpec {
     testCodec[LocalDateTime]
     testCodec[InetAddress]
     testCodec[InetSocketAddress]
+    testCodec[ByteBuffer]
   }
 }

@@ -38,6 +38,24 @@ trait OtherInstances {
       { case (host: String, port: Int) => new InetSocketAddress(host, port) },
       inetSocketAddress => (inetSocketAddress.getHostName, inetSocketAddress.getPort)
     )
+
+//  def toArray(byteBuffer:ByteBuffer): Array[Byte] = {
+//    if (byteBuffer.hasArray)
+//      byteBuffer.array
+//    else {
+//      (byteBuffer: java.nio.Buffer).position(0)
+//      val arr = new Array[Byte](byteBuffer.remaining())
+//      byteBuffer.get(arr)
+//      arr
+//    }
+//  }
+//
+//  def toByteBuffer(arr:Array[Byte]): ByteBuffer = ByteBuffer.wrap(arr)
+//
+//  implicit def ByteBufferInstance(implicit pf: Codec[Array[Byte]]): Codec[ByteBuffer] =
+//    pf.map(arr => toByteBuffer(arr) ,toArray)
+
+
 }
 
 object OtherInstances extends OtherInstances
