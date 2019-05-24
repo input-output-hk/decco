@@ -48,29 +48,24 @@ trait ProductInstances {
       }
     }
 
-  implicit val cNilPC: Codec[CNil] = new Codec[CNil] {
-    override def size(t: CNil): Int = 0
-    override def encodeImpl(t: CNil, start: Int, destination: ByteBuffer): Unit =
-      throw new UnsupportedOperationException("CNil encoding not defined")
-    override def decodeImpl(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[CNil]] =
-      throw new UnsupportedOperationException("CNil decoding not defined")
-  }
+  implicit def cNilPC: Codec[CNil] =
+    throw new UnsupportedOperationException("CNil decoding not defined")
 
   implicit def cUnionPC[H: ClassTag, T <: Coproduct](
       implicit hPc: Lazy[Codec[H]],
-      tPc: Codec[T]
+      tPc: Lazy[Codec[T]]
   ): Codec[H :+: T] = new Codec[H :+: T] {
 
     override def size(ht: H :+: T): Int = ht match {
       case Inl(h) => hPc.value.size(h)
-      case Inr(t) => tPc.size(t)
+      case Inr(t) => tPc.value.size(t)
     }
 
     override def encodeImpl(ht: H :+: T, start: Int, destination: ByteBuffer): Unit = ht match {
       case Inl(h) =>
         hPc.value.encodeImpl(h, start, destination)
       case Inr(t) =>
-        tPc.encodeImpl(t, start, destination)
+        tPc.value.encodeImpl(t, start, destination)
     }
 
     override def decodeImpl(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[H :+: T]] = {
@@ -78,7 +73,7 @@ trait ProductInstances {
         case Right(DecodeResult(hr, hni)) =>
           Right(DecodeResult(Inl(hr), hni))
         case Left(_) =>
-          tPc.decodeImpl(start, source).map(tResult => DecodeResult(Inr(tResult.decoded), tResult.nextIndex))
+          tPc.value.decodeImpl(start, source).map(tResult => DecodeResult(Inr(tResult.decoded), tResult.nextIndex))
       }
     }
   }

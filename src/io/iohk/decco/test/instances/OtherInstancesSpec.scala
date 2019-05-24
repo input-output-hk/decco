@@ -72,5 +72,6 @@ class OtherInstancesSpec extends FlatSpec {
     testCodec[LocalDateTime]
     testCodec[InetAddress]
     testCodec[InetSocketAddress]
+    testCodec[ByteBuffer]
   }
 }

@@ -10,6 +10,19 @@ trait NativeInstances {
   private def bool2byte(b: Boolean): Byte = if (b) 1 else 0
   private def byte2bool(b: Byte): Boolean = b != 0
 
+  private def toArray(byteBuffer: ByteBuffer): Array[Byte] = {
+    if (byteBuffer.hasArray)
+      byteBuffer.array
+    else {
+      (byteBuffer: java.nio.Buffer).position(0)
+      val arr = new Array[Byte](byteBuffer.remaining())
+      byteBuffer.get(arr)
+      arr
+    }
+  }
+
+  private def toByteBuffer(arr: Array[Byte]): ByteBuffer = ByteBuffer.wrap(arr)
+
   implicit val ByteCodec: Codec[Byte] = new NativeCodec[Byte](size = 1, _.put(_, _), _.get(_))
   implicit val ShortCodec: Codec[Short] = new NativeCodec[Short](size = 2, _.putShort(_, _), _.getShort(_))
   implicit val IntCodec: Codec[Int] = new NativeCodec[Int](size = 4, _.putInt(_, _), _.getInt(_))
@@ -36,6 +49,9 @@ trait NativeInstances {
     new NativeArrayCodec[Double, DoubleBuffer](8, _.asDoubleBuffer, _.put(_), _.get(_))
 
   implicit val BooleanArrayCodec: Codec[Array[Boolean]] = ByteArrayCodec.map(_.map(byte2bool), _.map(bool2byte))
+
+  implicit val ByteBufferCodec: Codec[ByteBuffer] = ByteArrayCodec.map(toByteBuffer, toArray)
+
 }
 
 object NativeInstances extends NativeInstances

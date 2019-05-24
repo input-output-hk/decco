@@ -1,6 +1,7 @@
 package io.iohk.decco
 package test
 
+import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.util.UUID
 
@@ -9,15 +10,16 @@ import org.scalatest.FlatSpec
 import org.scalatest.Matchers._
 import io.iohk.decco.auto._
 import org.scalatest.EitherValues._
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
+
 import io.iohk.decco.test.utils.CodecTestingHelpers
 
 class CodecSpec extends FlatSpec with CodecTestingHelpers {
 
   behavior of "Codecs"
 
-  case class A(s: String, i: Int, l: List[String], u: UUID, f: Float)
+  case class A(s: String, i: Int, l: List[String], u: UUID, f: Float, ia: InetSocketAddress)
 
   case class B(s: String, i: Int, l: List[String], u: UUID, f: Float)
 
@@ -29,15 +31,15 @@ class CodecSpec extends FlatSpec with CodecTestingHelpers {
 
   case class S2[T]() extends Base[T]
 
-  implicit val arbitraryA: Arbitrary[A] = Arbitrary(
-    for {
-      s <- arbitrary[String]
-      i <- arbitrary[Int]
-      l <- arbitrary[List[String]]
-      u <- arbitrary[UUID]
-      f <- arbitrary[Float]
-    } yield A(s, i, l, u, f)
-  )
+  implicit val arbitraryA: Arbitrary[A] = Arbitrary(for {
+    s <- arbitrary[String]
+    i <- arbitrary[Int]
+    l <- arbitrary[List[String]]
+    u <- arbitrary[UUID]
+    f <- arbitrary[Float]
+    a <- arbitrary[String]
+    p <- Gen.choose[Int](0, 65535)
+  } yield A(s, i, l, u, f, new InetSocketAddress(a, p)))
 
   they should "work for fixed width types" in {
     testCodec[Int]

@@ -13,6 +13,7 @@ trait Codec[T] { self =>
   final def encode[B](t: T)(implicit bi: BufferInstantiator[B]): B = {
     val bb = bi.instantiateByteBuffer(size(t))
     encodeImpl(t, 0, bb)
+    (bb: java.nio.Buffer).position(0)
     bi.asB(bb)
   }
 

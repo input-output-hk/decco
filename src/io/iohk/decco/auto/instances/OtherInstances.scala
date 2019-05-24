@@ -38,6 +38,7 @@ trait OtherInstances {
       { case (host: String, port: Int) => new InetSocketAddress(host, port) },
       inetSocketAddress => (inetSocketAddress.getHostName, inetSocketAddress.getPort)
     )
+
 }
 
 object OtherInstances extends OtherInstances
