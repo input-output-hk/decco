@@ -61,8 +61,6 @@ class OtherInstancesSpec extends FlatSpec {
     } yield new InetSocketAddress(s, i)
   )
 
-
-
   behavior of "Other instances"
 
   they should "work" in {

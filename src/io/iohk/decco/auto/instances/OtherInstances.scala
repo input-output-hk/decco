@@ -55,7 +55,6 @@ trait OtherInstances {
 //  implicit def ByteBufferInstance(implicit pf: Codec[Array[Byte]]): Codec[ByteBuffer] =
 //    pf.map(arr => toByteBuffer(arr) ,toArray)
 
-
 }
 
 object OtherInstances extends OtherInstances

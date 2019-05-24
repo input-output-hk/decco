@@ -10,7 +10,7 @@ trait NativeInstances {
   private def bool2byte(b: Boolean): Byte = if (b) 1 else 0
   private def byte2bool(b: Byte): Boolean = b != 0
 
-  private def toArray(byteBuffer:ByteBuffer): Array[Byte] = {
+  private def toArray(byteBuffer: ByteBuffer): Array[Byte] = {
     if (byteBuffer.hasArray)
       byteBuffer.array
     else {
@@ -21,7 +21,7 @@ trait NativeInstances {
     }
   }
 
-  private def toByteBuffer(arr:Array[Byte]): ByteBuffer = ByteBuffer.wrap(arr)
+  private def toByteBuffer(arr: Array[Byte]): ByteBuffer = ByteBuffer.wrap(arr)
 
   implicit val ByteCodec: Codec[Byte] = new NativeCodec[Byte](size = 1, _.put(_, _), _.get(_))
   implicit val ShortCodec: Codec[Short] = new NativeCodec[Short](size = 2, _.putShort(_, _), _.getShort(_))

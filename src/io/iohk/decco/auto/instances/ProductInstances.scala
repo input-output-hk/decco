@@ -48,8 +48,8 @@ trait ProductInstances {
       }
     }
 
-  implicit def cNilPC: Codec[CNil] = 
-      throw new UnsupportedOperationException("CNil decoding not defined")
+  implicit def cNilPC: Codec[CNil] =
+    throw new UnsupportedOperationException("CNil decoding not defined")
 
   implicit def cUnionPC[H: ClassTag, T <: Coproduct](
       implicit hPc: Lazy[Codec[H]],
