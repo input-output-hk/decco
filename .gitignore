@@ -3,7 +3,4 @@
 target/
 *.log
 *.iml
-
-bazel-*
-.bazel-*
-.dazel_run
+/out/
