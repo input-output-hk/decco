@@ -50,12 +50,11 @@ object deps {
     Agg(ivy"org.scalatest::scalatest:3.0.5")
 }
 
-trait IOHKModule extends CompositeModule with  PublishModule  {
+trait IOHKModule extends CompositeModule with PublishModule {
 
   def scalaVersion = "2.12.7"
 
   def publishVersion = "1.0-SNAPSHOT"
-
 
   def pomSettings = PomSettings(
     description = "codec library",
@@ -79,10 +78,8 @@ object src extends Module {
       object decco extends IOHKModule {
         override def artifactName = "decco"
 
-
         object auto extends IOHKModule {
           override def artifactName = "decco-auto"
-
 
           def ivyDeps =
             deps.shapeless ++
