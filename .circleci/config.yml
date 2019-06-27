@@ -44,21 +44,20 @@ jobs:
 
             echo "$gpgPrivateKey" | base64 --decode > gpg_key
 
-            gpg2 --batch --passphrase "$gpgPassphrase" --import gpg_key
+            gpg --batch --passphrase "$gpgPassphrase" --import gpg_key
 
             rm gpg_key
 
-            gpg2 --list-secret-keys
+            gpg --list-secret-keys
 
             echo "$otrust" > otrust.txt
 
-            gpg2 --import-ownertrust otrust.txt
+            gpg --import-ownertrust otrust.txt
 
-            gpg2 --list-secret-keys
+            gpg --list-secret-keys
 
-            mill mill.scalalib.PublishModule/publishAll \
-                "$username:$password" \
-                "$gpgPassphrase" \
-                __.publishArtifacts \
-                --release \
-                true
+            mill src.io.iohk.decco.publish \
+            --sonatypeCreds "$username:$password"  \
+            --gpgKeyName "$gpgKeyName" \
+            --signed "true" \
+            --release false
