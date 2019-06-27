@@ -7,6 +7,8 @@ export GPG_TTY
 
 gpg2 --version
 
+gpg-agent --version
+
 echo $GPG_KEY | base64 --decode > gpg_key
 
 gpg2 --batch --passphrase "$GPG_PASSPHRASE" --import --no-tty --yes gpg_key
