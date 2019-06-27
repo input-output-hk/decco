@@ -34,9 +34,7 @@ jobs:
           command: |
             set -eux
 
-            echo $gpgPrivateKey | base64 --decode > gpg_key
-
-            gpg --import gpg_key
+            gpg --import $gpgPrivateKey
 
             rm gpg_key
 
