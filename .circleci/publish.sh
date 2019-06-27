@@ -2,6 +2,8 @@
 
 set -eux
 
+export $gpgPrivateKey
+
 echo $gpgPrivateKey | base64 --decode > gpg_key
 
 gpg --import gpg_key

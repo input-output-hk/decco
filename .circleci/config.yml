@@ -22,7 +22,7 @@ jobs:
 
       - run:
           name: install gpg2
-          command: apt update && apt install -y gpgv2
+          command: apt update && apt install -y gpg2
 
       - run:
           name: test
