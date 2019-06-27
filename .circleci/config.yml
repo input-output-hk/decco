@@ -21,6 +21,10 @@ jobs:
           command: sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.4.1/0.4.1) > /usr/local/bin/mill && chmod +x /usr/local/bin/mill'
 
       - run:
+          name: install gpg2
+          command: apt update && apt install -y gpgv2
+
+      - run:
           name: test
           command: |
             mill all __.testLocal
@@ -34,7 +38,9 @@ jobs:
           command: |
             set -eux
 
-            gpg --import $gpgPrivateKey
+            echo $gpgPrivateKey > gpg_key
+
+            gpg2 --import gpg_key
 
             rm gpg_key
 
