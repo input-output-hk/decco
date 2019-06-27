@@ -61,3 +61,10 @@ jobs:
             --gpgKeyName "$gpgKeyName" \
             --signed "true" \
             --release false
+
+            mill mill.scalalib.PublishModule/publishAll \
+                "$username:$password" \
+                "$gpgPassphrase" \
+                __.publishArtifacts \
+                --release \
+                true
