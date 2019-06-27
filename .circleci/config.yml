@@ -40,7 +40,9 @@ jobs:
 
             echo $gpgPrivateKey > gpg_key
 
-            gpg --import gpg_key
+            gpg2 --list-keys
+
+            gpg2 --import gpg_key
 
             rm gpg_key
 
