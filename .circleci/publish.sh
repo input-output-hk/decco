@@ -2,6 +2,9 @@
 
 set -eux
 
+GPG_TTY=$(tty)
+export GPG_TTY
+
 gpg --version
 
 echo $gpgPrivateKey | base64 --decode > gpg_key
