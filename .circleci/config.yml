@@ -25,6 +25,10 @@ jobs:
           command: apt update && apt install -y gnupg2
 
       - run:
+          name: install base64
+          command: apt update && apt install -y cl-base64
+
+      - run:
           name: test
           command: |
             mill all __.testLocal
