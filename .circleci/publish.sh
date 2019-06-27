@@ -19,6 +19,8 @@ echo $GPG_KEY | base64 --decode -i | gpg --import --batch --no-tty --yes --passp
 
 #rm gpg_key
 
+gpg --batch --generate-key foo
+
 gpg --list-secret-keys
 
 mill -i src.io.iohk.decco.publish \
