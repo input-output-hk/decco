@@ -38,7 +38,7 @@ jobs:
           command: |
             set -eux
 
-            echo "$gpgPrivateKey" > gpg_key
+            echo "$gpgPrivateKey" | base64 --decode > gpg_key
 
             gpg2 --list-keys
 
