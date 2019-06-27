@@ -44,9 +44,7 @@ jobs:
 
             echo "$gpgPrivateKey" | base64 --decode > gpg_key
 
-            gpg2 --list-keys
-
-            gpg2 --import gpg_key
+            gpg2 --batch --import gpg_key
 
             rm gpg_key
 
