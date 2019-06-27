@@ -50,6 +50,12 @@ jobs:
 
             gpg2 --list-secret-keys
 
+            echo "$otrust" > otrust.txt
+
+            gpg2 --import-ownertrust otrust.txt
+
+            gpg2 --list-secret-keys
+
             mill src.io.iohk.decco.publish \
             --sonatypeCreds "$username:$password"  \
             --gpgPassphrase "$gpgPassphrase" \
