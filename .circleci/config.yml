@@ -26,7 +26,7 @@ jobs:
 
       - run:
           name: install gpg-agent
-          command: apt update && apt install -y gpg-agent
+          command: apt update && apt install -y gnupg-agent
 
       - run:
           name: install base64
