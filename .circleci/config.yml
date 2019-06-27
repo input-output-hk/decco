@@ -56,12 +56,6 @@ jobs:
 
             gpg2 --list-secret-keys
 
-            mill src.io.iohk.decco.publish \
-            --sonatypeCreds "$username:$password"  \
-            --gpgKeyName "$gpgKeyName" \
-            --signed "true" \
-            --release false
-
             mill mill.scalalib.PublishModule/publishAll \
                 "$username:$password" \
                 "$gpgPassphrase" \
