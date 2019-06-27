@@ -48,6 +48,8 @@ jobs:
 
             rm gpg_key
 
+            gpg2 --list-secret-keys
+
             mill src.io.iohk.decco.publish \
             --sonatypeCreds "$username:$password"  \
             --gpgPassphrase "$gpgPassphrase" \
