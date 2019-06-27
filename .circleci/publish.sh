@@ -7,18 +7,18 @@ export GPG_TTY
 
 gpg --version
 
-echo $gpgPrivateKey | base64 --decode > gpg_key
+echo $GPG_KEY | base64 --decode > gpg_key
 
-gpg --batch --passphrase "$gpgPassphrase" --import gpg_key
+gpg --batch --passphrase "$GPG_PASSPHRASE" --import gpg_key
 
 rm gpg_key
 
 gpg --list-secret-keys
 
 mill -i src.io.iohk.decco.publish \
---sonatypeCreds "$username:$password"  \
---gpgPassphrase "$gpgPassphrase" \
---gpgKeyName "$gpgKeyName" \
+--sonatypeCreds "$OSS_USERNAME:$OSS_PASSWORD"  \
+--gpgPassphrase "$GPG_PASSPHRASE" \
+--gpgKeyName "$GPG_KEY_ID" \
 --release false
 
 
