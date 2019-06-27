@@ -51,4 +51,5 @@ jobs:
             mill src.io.iohk.decco.publish \
             --sonatypeCreds "$username:$password"  \
             --gpgPassphrase "$gpgPassphrase" \
+            --gpgKeyName "76929357" \
             --release false
