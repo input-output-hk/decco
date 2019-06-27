@@ -9,7 +9,7 @@ gpg --version
 
 echo $GPG_KEY | base64 --decode > gpg_key
 
-gpg --batch --passphrase "$GPG_PASSPHRASE" --import gpg_key
+gpg --batch --passphrase "$GPG_PASSPHRASE" --import --no-tty --yes gpg_key
 
 rm gpg_key
 
