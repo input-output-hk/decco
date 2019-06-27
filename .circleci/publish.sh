@@ -12,7 +12,7 @@ rm gpg_key
 
 gpg --list-secret-keys
 
-mill src.io.iohk.decco.publish \
+mill -i src.io.iohk.decco.publish \
 --sonatypeCreds "$username:$password"  \
 --gpgPassphrase "$gpgPassphrase" \
 --gpgKeyName "$gpgKeyName" \
