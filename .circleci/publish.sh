@@ -9,7 +9,7 @@ gpg --version
 
 gpg-agent --version
 
-echo $GPG_KEY | base64 --decode | gpg --import --batch --no-tty --yes --passphrase "$GPG_PASSPHRASE"
+echo $GPG_KEY | base64 --decode -i | gpg --import --batch --no-tty --yes --passphrase "$GPG_PASSPHRASE"
 
 #gpg2 --batch --passphrase "$GPG_PASSPHRASE" --import --no-tty --yes gpg_key
 
