@@ -2,12 +2,16 @@
 
 set -eux
 
+export GNUPGHOME=/root/.gnupg
+
 GPG_TTY=$(tty)
 export GPG_TTY
 
 gpg --version
 
 gpg-agent --version
+
+
 
 echo $GPG_KEY | base64 --decode -i | gpg --import --batch --no-tty --yes --passphrase "$GPG_PASSPHRASE"
 
