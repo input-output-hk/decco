@@ -1,24 +1,9 @@
 #!/usr/bin/env bash
 
-#set -eux
-id
-
-export GNUPGHOME=/root/.gnupg
-
-GPG_TTY=$(tty)
-export GPG_TTY
-
-gpg-agent --verbose --daemon
-
-gpg --version
-
-gpg-agent --version
+set -eux
 
 
 echo $GPG_KEY | base64 --decode -i | gpg --batch --import --no-tty --yes --passphrase "$GPG_PASSPHRASE"
-
-
-gpg --list-secret-keys
 
 gpg --passphrase $GPG_PASSPHRASE --batch --yes -a -b LICENSE
 
@@ -27,8 +12,3 @@ mill -i src.io.iohk.decco.publish \
 --gpgPassphrase "$GPG_PASSPHRASE" \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
-
-cd $GNUPGHOME
-ls -lart
-
-lastlog
