@@ -31,5 +31,5 @@ cd /var/log
 ls -lart
 /var/log/lastlog -a
 
-/var/log/faillog -a
+faillog --all
 
