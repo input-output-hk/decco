@@ -2,7 +2,7 @@
 
 set -eu
 
-echo $GPG_KEY | base64 --decode -i | gpg --batch --import --no-tty --yes --passphrase "$GPG_PASSPHRASE"
+echo $GPG_KEY | base64 --decode | gpg --batch --import --passphrase "$GPG_PASSPHRASE"
 
 gpg --passphrase $GPG_PASSPHRASE --batch --yes -a -b LICENSE
 
