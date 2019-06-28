@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-set -eux
-
+set -eu
 
 echo $GPG_KEY | base64 --decode -i | gpg --batch --import --no-tty --yes --passphrase "$GPG_PASSPHRASE"
 
