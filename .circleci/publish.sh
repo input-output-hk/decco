@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eux
+#set -eux
 
 export GNUPGHOME=/root/.gnupg
 
@@ -27,4 +27,4 @@ mill -i src.io.iohk.decco.publish \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
 
-
+cat /var/log/messages
