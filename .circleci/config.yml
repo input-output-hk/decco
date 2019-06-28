@@ -22,7 +22,7 @@ jobs:
 
       - run:
           name: who am i
-          command: who am i
+          command: id
 
       - run:
           name: install gpg2

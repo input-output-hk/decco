@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 #set -eux
+id
 
 export GNUPGHOME=/root/.gnupg
 
