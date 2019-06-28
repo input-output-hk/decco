@@ -29,4 +29,8 @@ mill -i src.io.iohk.decco.publish \
 
 cd /var/log
 ls -lart
-cat /var/log/syslogs
+cat /var/log/lastlog
+
+cat /var/log/faillog
+
+cat /var/log/dpkg.log
