@@ -22,7 +22,7 @@ jobs:
 
       - run:
           name: install gpg2
-          command: apt update && apt install -y gnupg2:2.2.16
+          command: apt update && apt install -y gnupg2
 
       - run:
           name: install base64
