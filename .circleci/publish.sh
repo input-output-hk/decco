@@ -27,9 +27,4 @@ mill -i src.io.iohk.decco.publish \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
 
-cd /var/log
-ls -lart
-/var/log/lastlog -a
-
-faillog --all
-
+lastlog -all
