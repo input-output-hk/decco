@@ -23,4 +23,4 @@ mill -i src.io.iohk.decco.publish \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
 
-lastlog -all
+lastlog
