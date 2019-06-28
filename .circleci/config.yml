@@ -24,7 +24,7 @@ jobs:
           name: who am i
           command: id
 
-     - run:
+      - run:
           name: install gpg2
           command: sh -c "apt update && apt install -y gnupg2 && mv /usr/bin/gpg /usr/bin/gpg-vanilla && echo '#!/bin/sh\n\n/usr/bin/gpg-vanilla --no-tty --pinentry loopback \$@' > /usr/bin/gpg && chmod 755 /usr/bin/gpg && cat /usr/bin/gpg"
 
