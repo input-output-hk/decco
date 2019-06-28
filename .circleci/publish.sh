@@ -7,6 +7,8 @@ export GNUPGHOME=/root/.gnupg
 GPG_TTY=$(tty)
 export GPG_TTY
 
+gpg-agent --daemon
+
 gpg --version
 
 gpg-agent --version
