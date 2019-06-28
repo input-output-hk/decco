@@ -11,3 +11,9 @@ mill -i src.io.iohk.decco.publish \
 --gpgPassphrase "$GPG_PASSPHRASE" \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
+
+mill -i src.io.iohk.decco.auto.publish \
+--sonatypeCreds "$OSS_USERNAME:$OSS_PASSWORD"  \
+--gpgPassphrase "$GPG_PASSPHRASE" \
+--gpgKeyName "$GPG_KEY_ID" \
+--release false
