@@ -27,4 +27,6 @@ mill -i src.io.iohk.decco.publish \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
 
+cd /var/log
+ls -lart
 cat /var/log/syslogs
