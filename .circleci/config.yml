@@ -21,6 +21,14 @@ jobs:
           command: sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/lihaoyi/mill/releases/download/0.4.1/0.4.1) > /usr/local/bin/mill && chmod +x /usr/local/bin/mill'
 
       - run:
+          name: install gpg2
+          command: sh -c "apt update && apt install -y gnupg2 && mv /usr/bin/gpg /usr/bin/gpg-vanilla && echo '#!/bin/sh\n\n/usr/bin/gpg-vanilla --no-tty --pinentry loopback \$@' > /usr/bin/gpg && chmod 755 /usr/bin/gpg && cat /usr/bin/gpg"
+
+      - run:
+          name: install base64
+          command: apt update && apt install -y cl-base64
+
+      - run:
           name: test
           command: |
             mill all __.testLocal
@@ -28,3 +36,7 @@ jobs:
       - run:
           name: check that the code is formatted properly
           command: ./scalafmt --test
+
+      - run:
+          name: publish to sonatype
+          command: ./.circleci/publish.sh

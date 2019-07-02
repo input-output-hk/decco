@@ -2,7 +2,7 @@
 
 import mill._, scalalib._, os._
 import mill.api.Loose.Agg
-
+import mill.scalalib.publish._
 trait CompositeModule extends ScalaModule { outer =>
 
   def sources = {
@@ -28,7 +28,7 @@ trait CompositeModule extends ScalaModule { outer =>
   trait Tests extends super.Tests with CompositeModule {
     def ivyDepsExtra: Agg[Dep] = Agg()
     final def ivyDeps = ivyDepsExtra ++ testingLibrary
-    def moduleDepsExtra: Seq[JavaModule] = Seq()
+    def moduleDepsExtra: Seq[PublishModule] = Seq()
     final def moduleDeps = (Seq(outer) ++ moduleDepsExtra)
     def testFrameworks = Seq("org.scalatest.tools.Framework")
     def testingLibrary = Agg(ivy"org.scalatest::scalatest:3.0.5")
@@ -50,9 +50,20 @@ object deps {
     Agg(ivy"org.scalatest::scalatest:3.0.5")
 }
 
-trait IOHKModule extends CompositeModule {
+trait IOHKModule extends CompositeModule with PublishModule {
 
   def scalaVersion = "2.12.7"
+
+  def publishVersion = "1.0-SNAPSHOT"
+
+  def pomSettings = PomSettings(
+    description = "codec library",
+    organization = "io.iohk",
+    url = "https://github.com/input-output-hk/decco",
+    licenses = Seq(License.`Apache-2.0`),
+    versionControl = VersionControl.github("input-output-hk", "decco"),
+    developers = Seq()
+  )
 
   trait IOHKTest extends Tests {
     def testingLibrary =
@@ -65,8 +76,10 @@ object src extends Module {
     object iohk extends Module {
 
       object decco extends IOHKModule {
+        override def artifactName = "decco"
 
         object auto extends IOHKModule {
+          override def artifactName = "decco-auto"
 
           def ivyDeps =
             deps.shapeless ++
