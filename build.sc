@@ -5,11 +5,11 @@ import mill.api.Loose.Agg
 import mill.scalalib.publish._
 trait CompositeModule extends ScalaModule { outer =>
 
-  def sources = {
+  override def sources = {
     T.sources { millSourcePath }
   }
 
-  def allSourceFiles = T {
+  override def allSourceFiles = T {
     val submodules =
       millModuleDirectChildren.map(_.millSourcePath)
     def isHiddenFile(path: os.Path) = path.last.startsWith(".")
@@ -19,7 +19,7 @@ trait CompositeModule extends ScalaModule { outer =>
     for {
       root <- allSources()
       if os.exists(root.path)
-      path <- (if (os.isDir(root.path)) os.walk(root.path) else Seq(root.path))
+      path <- if (os.isDir(root.path)) os.walk(root.path) else Seq(root.path)
       if os
         .isFile(path) && ((path.ext == "scala" || path.ext == "java") && !isHiddenFile(path) && !isFromSubmodule(path))
     } yield PathRef(path)
@@ -27,9 +27,9 @@ trait CompositeModule extends ScalaModule { outer =>
 
   trait Tests extends super.Tests with CompositeModule {
     def ivyDepsExtra: Agg[Dep] = Agg()
-    final def ivyDeps = ivyDepsExtra ++ testingLibrary
+    override final def ivyDeps = ivyDepsExtra ++ testingLibrary
     def moduleDepsExtra: Seq[PublishModule] = Seq()
-    final def moduleDeps = (Seq(outer) ++ moduleDepsExtra)
+    override final def moduleDeps = (Seq(outer) ++ moduleDepsExtra)
     def testFrameworks = Seq("org.scalatest.tools.Framework")
     def testingLibrary = Agg(ivy"org.scalatest::scalatest:3.0.5")
 
@@ -81,23 +81,23 @@ object src extends Module {
         object auto extends IOHKModule {
           override def artifactName = "decco-auto"
 
-          def ivyDeps =
+          override def ivyDeps =
             deps.shapeless ++
               deps.akkaActor
 
-          def moduleDeps = Seq(decco)
+          override def moduleDeps = Seq(decco)
         }
 
         object test extends IOHKTest {
-          def moduleDepsExtra = Seq(auto, utils)
-          def ivyDepsExtra = deps.scalacheck
+          override def moduleDepsExtra = Seq(auto, utils)
+          override def ivyDepsExtra = deps.scalacheck
 
           object utils extends IOHKModule {
-            def ivyDeps =
+            override def ivyDeps =
               deps.scalacheck ++
                 deps.scalatest
 
-            def moduleDeps = Seq(decco)
+            override def moduleDeps = Seq(decco)
           }
         }
       }

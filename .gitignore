@@ -4,3 +4,4 @@ target/
 *.log
 *.iml
 /out/
+/.circleci/out/
