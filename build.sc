@@ -66,7 +66,7 @@ trait IOHKModule extends CompositeModule with PublishModule {
   )
 
   trait IOHKTest extends Tests {
-    def testingLibrary =
+    override def testingLibrary =
       deps.scalatest
   }
 }
