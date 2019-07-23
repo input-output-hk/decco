@@ -20,6 +20,12 @@ mill src.io.iohk.decco.auto.publish \
 --gpgKeyName "$GPG_KEY_ID" \
 --release false
 
+mill src.io.iohk.decco.test.utils.publish \
+--sonatypeCreds "$OSS_USERNAME:$OSS_PASSWORD"  \
+--gpgPassphrase "$GPG_PASSPHRASE" \
+--gpgKeyName "$GPG_KEY_ID" \
+--release false
+
 else
 
   echo "Skipping publish step"
