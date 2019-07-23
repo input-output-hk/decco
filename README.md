@@ -16,6 +16,9 @@ Hence, any version in `develop` might have bugs when deployed for an end-to-end 
 
 To build the codebase, `mill src.io.iohk.decco.test` or `mill src.io.iohk.decco.auto.test`
 
+To run a single test `mill src.io.iohk.decco.test.testOne io.iohk.decco.test.instances.CollectionInstancesSpec`
+
+
 To publish the jar locally, `mill src.io.iohk.decco.publishLocal` or `mill src.io.iohk.decco.auto.publishLocal`
 
 In order to keep the code format consistent, we use scalafmt and git hooks, follow these steps to configure it accordingly (otherwise, your changes are going to be rejected by CircleCI):

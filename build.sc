@@ -104,6 +104,10 @@ object src extends Module {
 
             override def moduleDeps = Seq(decco)
           }
+
+          def testOne(args: String*) = T.command {
+            super.runMain("org.scalatest.run", args: _*)
+          }
         }
       }
 
