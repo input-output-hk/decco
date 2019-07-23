@@ -14,7 +14,7 @@ Hence, any version in `develop` might have bugs when deployed for an end-to-end 
 
 ## Working with the codebase
 
-To build the codebase, `mill src.io.iohk.decco.test` or `mill src.io.iohk.decco.auto.test`
+To build the codebase, `mill src.io.iohk.decco.test`
 
 To run a single test `mill src.io.iohk.decco.test.testOne io.iohk.decco.test.instances.CollectionInstancesSpec`
 
