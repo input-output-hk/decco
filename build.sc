@@ -3,7 +3,7 @@
 import mill._, scalalib._, os._
 import mill.api.Loose.Agg
 import mill.scalalib.publish._
-trait CompositeModule extends ScalaModule  { outer =>
+trait CompositeModule extends ScalaModule { outer =>
 
   override def sources = {
     T.sources { millSourcePath }
@@ -34,8 +34,6 @@ trait CompositeModule extends ScalaModule  { outer =>
     def testingLibrary = Agg(ivy"org.scalatest::scalatest:3.0.5")
 
   }
-
-
 
 }
 
