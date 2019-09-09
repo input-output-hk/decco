@@ -12,7 +12,6 @@ import io.iohk.decco.auto._
 import org.scalatest.EitherValues._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
-
 import io.iohk.decco.test.utils.CodecTestingHelpers
 
 class CodecSpec extends FlatSpec with CodecTestingHelpers {
@@ -58,7 +57,7 @@ class CodecSpec extends FlatSpec with CodecTestingHelpers {
   }
 
   they should "compose from generic types" in {
-    def wrappingTest[T: Codec: Arbitrary] = {
+    def wrappingTest[T: CodecContract: Arbitrary] = {
 
       implicit val arbitraryWrap: Arbitrary[Wrap[T]] = Arbitrary(
         for {

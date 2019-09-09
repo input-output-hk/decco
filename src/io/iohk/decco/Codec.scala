@@ -2,7 +2,28 @@ package io.iohk.decco
 
 import java.nio.ByteBuffer
 
-trait Codec[T] { self =>
+trait Codec[T] {
+
+  import Codec.Failure
+
+  def encode[B](t: T)(implicit bi: BufferInstantiator[B]): B
+
+  def decode[B](start: Int, source: B)(implicit bi: BufferInstantiator[B]): Either[Failure, T]
+
+  def decode[B](source: B)(implicit bi: BufferInstantiator[B]): Either[Failure, T]
+}
+
+object Codec {
+
+  case class DecodeResult[+T](decoded: T, nextIndex: Int)
+  case object Failure
+  type Failure = Failure.type
+
+  def apply[T](implicit ev: Codec[T]): Codec[T] = ev
+
+}
+
+trait CodecContract[T] { self =>
 
   import Codec._
 
@@ -27,7 +48,7 @@ trait Codec[T] { self =>
 
   // SOME COMPOSITION FUNCTIONS
 
-  final def zip[U](that: Codec[U]): Codec[(T, U)] = new Codec[(T, U)] {
+  final def zip[U](that: CodecContract[U]): CodecContract[(T, U)] = new CodecContract[(T, U)] {
 
     def size(tu: (T, U)): Int = tu match {
       case (t, u) => self.size(t) + that.size(u)
@@ -55,7 +76,7 @@ trait Codec[T] { self =>
     }
   }
 
-  final def map[U](t2u: T => U, u2t: U => T): Codec[U] = new Codec[U] {
+  final def map[U](t2u: T => U, u2t: U => T): CodecContract[U] = new CodecContract[U] {
     def size(u: U): Int = self.size(u2t(u))
     def decodeImpl(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[U]] =
       self.decodeImpl(start, source) match {
@@ -69,7 +90,7 @@ trait Codec[T] { self =>
       self.encodeImpl(u2t(u), start, destination)
   }
 
-  final def mapOpt[U](t2u: T => Option[U], u2t: U => T): Codec[U] = new Codec[U] {
+  final def mapOpt[U](t2u: T => Option[U], u2t: U => T): CodecContract[U] = new CodecContract[U] {
     def size(u: U): Int = self.size(u2t(u))
     def decodeImpl(start: Int, source: ByteBuffer): Either[Failure, DecodeResult[U]] =
       self.decodeImpl(start, source) match {
@@ -87,15 +108,5 @@ trait Codec[T] { self =>
     def encodeImpl(u: U, start: Int, destination: ByteBuffer): Unit =
       self.encodeImpl(u2t(u), start, destination)
   }
-
-}
-
-object Codec {
-
-  case class DecodeResult[+T](decoded: T, nextIndex: Int)
-  case object Failure
-  type Failure = Failure.type
-
-  def apply[T](implicit ev: Codec[T]): Codec[T] = ev
 
 }

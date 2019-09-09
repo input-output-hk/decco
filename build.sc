@@ -48,6 +48,8 @@ object deps {
     Agg(ivy"org.scalacheck::scalacheck:1.14.0")
   val scalatest =
     Agg(ivy"org.scalatest::scalatest:3.0.5")
+  val snappy =
+    Agg(ivy"org.xerial.snappy:snappy-java:1.1.7.3")
 }
 
 trait IOHKModule extends CompositeModule with PublishModule {
@@ -88,9 +90,17 @@ object src extends Module {
           override def moduleDeps = Seq(decco)
         }
 
+        object snappy extends IOHKModule {
+          override def artifactName = "decco-snappy"
+
+          def ivyDeps = deps.snappy
+
+          def moduleDeps = Seq(decco, auto)
+        }
+
         object test extends IOHKTest {
 
-          override def moduleDepsExtra = Seq(auto, utils)
+          override def moduleDepsExtra = Seq(auto, snappy, utils)
           override def ivyDepsExtra = deps.scalacheck
 
           object utils extends IOHKModule {
