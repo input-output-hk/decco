@@ -4,6 +4,7 @@ package test.instances
 import org.scalatest.FlatSpec
 import io.iohk.decco.test.utils.CodecTestingHelpers._
 import auto.instances.NativeInstances._
+import auto.codecContract2Codec
 
 class NativeInstancesSpec extends FlatSpec {
 

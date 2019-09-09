@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
 
 trait ProductInstances {
 
-  implicit val hNilPC: Codec[HNil] = new Codec[HNil] {
+  implicit val hNilPC: CodecContract[HNil] = new CodecContract[HNil] {
     override def size(t: HNil): Int = 0
 
     override def encodeImpl(t: HNil, start: Int, destination: ByteBuffer): Unit = ()
@@ -19,8 +19,11 @@ trait ProductInstances {
       Right(DecodeResult(HNil, start))
   }
 
-  implicit def hConsPC[H, T <: HList](implicit hPc: Lazy[Codec[H]], tPc: Codec[T]): Codec[H :: T] =
-    new Codec[H :: T] {
+  implicit def hConsPC[H, T <: HList](
+      implicit hPc: Lazy[CodecContract[H]],
+      tPc: CodecContract[T]
+  ): CodecContract[H :: T] =
+    new CodecContract[H :: T] {
       override def size(ht: H :: T): Int = ht match {
         case h :: t =>
           hPc.value.size(h) + tPc.size(t)
@@ -48,13 +51,13 @@ trait ProductInstances {
       }
     }
 
-  implicit def cNilPC: Codec[CNil] =
+  implicit def cNilPC: CodecContract[CNil] =
     throw new UnsupportedOperationException("CNil decoding not defined")
 
   implicit def cUnionPC[H: ClassTag, T <: Coproduct](
-      implicit hPc: Lazy[Codec[H]],
-      tPc: Lazy[Codec[T]]
-  ): Codec[H :+: T] = new Codec[H :+: T] {
+      implicit hPc: Lazy[CodecContract[H]],
+      tPc: Lazy[CodecContract[T]]
+  ): CodecContract[H :+: T] = new CodecContract[H :+: T] {
 
     override def size(ht: H :+: T): Int = ht match {
       case Inl(h) => hPc.value.size(h)
@@ -80,10 +83,10 @@ trait ProductInstances {
 
   implicit def genericCoproduct[T, R <: Coproduct](
       implicit gen: Generic.Aux[T, R],
-      enc: Lazy[Codec[R]]
-  ): Codec[T] = {
+      enc: Lazy[CodecContract[R]]
+  ): CodecContract[T] = {
     val cd = enc.value
-    new Codec[T] {
+    new CodecContract[T] {
       override def size(t: T): Int = cd.size(gen.to(t))
       override def encodeImpl(t: T, start: Int, destination: ByteBuffer): Unit = {
         cd.encodeImpl(gen.to(t), start, destination)
@@ -98,11 +101,11 @@ trait ProductInstances {
 
   implicit def genericProduct[T: ClassTag, R <: HList](
       implicit gen: Generic.Aux[T, R],
-      enc: Lazy[Codec[R]]
-  ): Codec[T] = {
+      enc: Lazy[CodecContract[R]]
+  ): CodecContract[T] = {
     val code = typeCode[T]
     val cd = enc.value
-    new Codec[T] {
+    new CodecContract[T] {
       override def size(t: T): Int = code.length + cd.size(gen.to(t))
       override def encodeImpl(t: T, start: Int, destination: ByteBuffer): Unit = {
         (destination: java.nio.Buffer).position(start)

@@ -33,13 +33,13 @@ class ProductInstancesSpec extends FlatSpec {
     testCodec[TrafficLight, Green.type]
   }
 
-  def testsFor[A: Arbitrary: Codec: ClassTag]: Unit = {
+  def testsFor[A: Arbitrary: CodecContract: ClassTag]: Unit = {
     val aName = implicitly[ClassTag[A]].toString
     they should ("support Option[" + aName + "]") in {
       testCodec[Option[A]]
     }
 
-    def combinedWith[B: Arbitrary: Codec: ClassTag]: Unit = {
+    def combinedWith[B: Arbitrary: CodecContract: ClassTag]: Unit = {
       val bName = implicitly[ClassTag[B]].toString
       they should ("support Either[" + aName + ", " + bName + "]") in {
         testCodec[Either[A, B]]

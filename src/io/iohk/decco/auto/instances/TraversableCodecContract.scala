@@ -6,19 +6,19 @@ import java.nio.ByteBuffer
 import scala.collection.generic.{CanBuildFrom, IsTraversableLike}
 import scala.collection.GenTraversable
 
-object TraversableCodec {
+object TraversableCodecContract {
   type IsTraversableLikeAux[AA, R] = IsTraversableLike[R] { type A = AA }
 }
 
-import TraversableCodec._
+import TraversableCodecContract._
 
-class TraversableCodec[T, CT](
+class TraversableCodecContract[T, CT](
     implicit
-    iCodec: Codec[Int],
-    tCodec: Codec[T],
+    iCodec: CodecContract[Int],
+    tCodec: CodecContract[T],
     cbf: CanBuildFrom[CT, T, CT],
     itl: IsTraversableLikeAux[T, CT]
-) extends Codec[CT] {
+) extends CodecContract[CT] {
 
   override def encodeImpl(ts: CT, start: Int, destination: ByteBuffer): Unit = {
     val c = asCollection(ts)
@@ -33,7 +33,10 @@ class TraversableCodec[T, CT](
     }
   }
 
-  override def decodeImpl(start: Int, source: ByteBuffer): Either[Codec.Failure, Codec.DecodeResult[CT]] = {
+  override def decodeImpl(
+      start: Int,
+      source: ByteBuffer
+  ): Either[Codec.Failure, Codec.DecodeResult[CT]] = {
     iCodec.decodeImpl(start, source) match {
       case Right(Codec.DecodeResult(count, nextStart)) =>
         val builder = cbf()
